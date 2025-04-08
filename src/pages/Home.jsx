@@ -2,7 +2,9 @@ import React from "react";
 import banner from "../assets/images/homebanner.jpg";
 import { motion } from "framer-motion";
 import "../Components/Home.css";
+import { useNavigate } from "react-router-dom";
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <div className="home-banner" style={{ backgroundImage: `url(${banner})` }}>
       <motion.div
@@ -24,6 +26,7 @@ const Home = () => {
           className="cta-button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("./form")}
         >
           Create My CV Now
         </motion.button>

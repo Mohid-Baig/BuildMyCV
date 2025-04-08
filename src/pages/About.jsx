@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../Components/About.css";
 import team1 from "../assets/images/mohid.jpg";
-import team2 from "../assets/images/soban.jpeg";
+import team2 from "../assets/images/soban.jpg";
 import TiltedCard from "../Components/Animation/Card";
 
 const About = () => {

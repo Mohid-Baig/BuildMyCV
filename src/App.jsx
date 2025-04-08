@@ -6,6 +6,7 @@ import Mainlayout from "./layout/Mainlayout";
 import Template from "./pages/Template";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import Form from "./pages/Form";
 function App() {
   return (
     <div>
@@ -19,6 +20,7 @@ function App() {
           <Route path="/templates" element={<Template />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/form" element={<Form />} />
         </Route>
       </Routes>
     </div>
