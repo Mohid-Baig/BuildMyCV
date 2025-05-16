@@ -1,142 +1,608 @@
 import React, { useState } from "react";
-import "../Components/AISuggestionsForm.css";
+import "../Components/ResumeForm.css"; // We'll create this CSS file
 
-const Form = () => {
+const ResumeForm = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    summary: "",
-    experiences: [{ role: "", company: "", description: "" }],
+    personalInfo: {
+      firstName: "",
+      middleName: "",
+      lastName: "",
+      designation: "",
+      address: "",
+      email: "",
+      phone: "",
+      summary: "",
+      image: null,
+      imagePreview: "",
+    },
+    achievements: [],
+    experiences: [],
+    education: [],
+    projects: [],
     skills: [],
-    currentSkill: "",
   });
 
-  const handleChange = (e, index = null, field = null) => {
-    if (index !== null) {
-      const updatedExperiences = [...formData.experiences];
-      updatedExperiences[index][field] = e.target.value;
-      setFormData({ ...formData, experiences: updatedExperiences });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({
+          ...formData,
+          personalInfo: {
+            ...formData.personalInfo,
+            image: file,
+            imagePreview: reader.result,
+          },
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const addExperience = () => {
-    setFormData({
-      ...formData,
-      experiences: [
-        ...formData.experiences,
-        { role: "", company: "", description: "" },
-      ],
-    });
-  };
+  const handleChange = (e, section, index = null) => {
+    const { name, value } = e.target;
 
-  const addSkill = () => {
-    if (formData.currentSkill) {
+    if (index !== null) {
+      const updatedSection = [...formData[section]];
+      updatedSection[index][name] = value;
+      setFormData({ ...formData, [section]: updatedSection });
+    } else {
+      // For personal info fields
       setFormData({
         ...formData,
-        skills: [...formData.skills, formData.currentSkill],
-        currentSkill: "",
+        personalInfo: {
+          ...formData.personalInfo,
+          [name]: value,
+        },
       });
     }
   };
 
-  const handleSave = () => {
-    console.log("Form Data Saved:", formData);
+  // Add new entry to a section
+  const addEntry = (section, template) => {
+    setFormData({
+      ...formData,
+      [section]: [...formData[section], { ...template }],
+    });
+  };
+
+  // Remove entry from a section
+  const removeEntry = (section, index) => {
+    const updatedSection = [...formData[section]];
+    updatedSection.splice(index, 1);
+    setFormData({ ...formData, [section]: updatedSection });
   };
 
   return (
-    <div className="ai-form-container">
-      <h2>Build Your Resume</h2>
+    <div className="resume-form-container">
+      <h2 className="form-title">Build Your Resume</h2>
 
+      {/* Personal Information Section */}
       <div className="form-section">
-        <h3>Personal Information</h3>
-        <input
-          type="text"
-          name="name"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-section">
-        <h3>Professional Summary</h3>
-        <textarea
-          name="summary"
-          placeholder="Describe your professional background..."
-          value={formData.summary}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="form-section">
-        <h3>Work Experience</h3>
-        {formData.experiences.map((exp, index) => (
-          <div key={index} className="experience-entry">
+        <h3 className="section-title">Personal Information</h3>
+        <div className="form-grid cols-3">
+          <div className="form-group">
+            <label className="form-label">First Name*</label>
             <input
-              placeholder="Job Title"
-              value={exp.role}
-              onChange={(e) => handleChange(e, index, "role")}
-            />
-            <input
-              placeholder="Company"
-              value={exp.company}
-              onChange={(e) => handleChange(e, index, "company")}
-            />
-            <textarea
-              placeholder="Job Description"
-              value={exp.description}
-              onChange={(e) => handleChange(e, index, "description")}
+              type="text"
+              name="firstName"
+              value={formData.personalInfo.firstName}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="John"
+              required
             />
           </div>
-        ))}
-        <button onClick={addExperience}>+ Add Another Experience</button>
+
+          <div className="form-group">
+            <label className="form-label">Middle Name</label>
+            <input
+              type="text"
+              name="middleName"
+              value={formData.personalInfo.middleName}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="Herbert"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Last Name*</label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.personalInfo.lastName}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="Doe"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="form-grid cols-3">
+          <div className="form-group">
+            <label className="form-label">Your Image</label>
+            <input
+              type="file"
+              name="image"
+              onChange={handleImageUpload}
+              className="form-control"
+              accept="image/*"
+            />
+            {formData.personalInfo.imagePreview && (
+              <div className="image-preview">
+                <img src={formData.personalInfo.imagePreview} alt="Preview" />
+              </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Designation</label>
+            <input
+              type="text"
+              name="designation"
+              value={formData.personalInfo.designation}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="Sr. Accountant"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Address</label>
+            <input
+              type="text"
+              name="address"
+              value={formData.personalInfo.address}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="Lake Street-23"
+            />
+          </div>
+        </div>
+
+        <div className="form-grid cols-3">
+          <div className="form-group">
+            <label className="form-label">Email*</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.personalInfo.email}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="johndoe@gmail.com"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Phone*</label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.personalInfo.phone}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="456-768-798"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Summary</label>
+            <textarea
+              name="summary"
+              value={formData.personalInfo.summary}
+              onChange={(e) => handleChange(e, "personalInfo")}
+              className="form-control"
+              placeholder="Professional summary..."
+              rows="3"
+            />
+          </div>
+        </div>
       </div>
 
+      {/* Achievements Section */}
       <div className="form-section">
-        <h3>Skills</h3>
-        <div className="skills-input">
-          <input
-            type="text"
-            placeholder="Enter a skill (e.g., React, Project Management)"
-            value={formData.currentSkill}
-            onChange={(e) =>
-              setFormData({ ...formData, currentSkill: e.target.value })
+        <div className="section-header">
+          <h3 className="section-title">Achievements</h3>
+          <button
+            type="button"
+            className="add-btn"
+            onClick={() =>
+              addEntry("achievements", { title: "", description: "" })
             }
-          />
-          <button onClick={addSkill}>Add Skill</button>
+          >
+            + Add Achievement
+          </button>
         </div>
-        <div className="skills-list">
+
+        {formData.achievements.map((achievement, index) => (
+          <div key={index} className="form-row">
+            <div className="form-grid cols-2">
+              <div className="form-group">
+                <label className="form-label">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={achievement.title}
+                  onChange={(e) => handleChange(e, "achievements", index)}
+                  className="form-control"
+                  placeholder="Achievement title"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <input
+                  type="text"
+                  name="description"
+                  value={achievement.description}
+                  onChange={(e) => handleChange(e, "achievements", index)}
+                  className="form-control"
+                  placeholder="Achievement description"
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="remove-btn"
+              onClick={() => removeEntry("achievements", index)}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Similar sections for Experience, Education, Projects, and Skills */}
+      {/* Experience Section */}
+      <div className="form-section">
+        <div className="section-header">
+          <h3 className="section-title">Work Experience</h3>
+          <button
+            type="button"
+            className="add-btn"
+            onClick={() =>
+              addEntry("experiences", {
+                title: "",
+                organization: "",
+                location: "",
+                startDate: "",
+                endDate: "",
+                description: "",
+              })
+            }
+          >
+            + Add Experience
+          </button>
+        </div>
+
+        {formData.experiences.map((exp, index) => (
+          <div key={index} className="form-row">
+            <div className="form-grid cols-3">
+              <div className="form-group">
+                <label className="form-label">Title*</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={exp.title}
+                  onChange={(e) => handleChange(e, "experiences", index)}
+                  className="form-control"
+                  placeholder="Job title"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Company*</label>
+                <input
+                  type="text"
+                  name="organization"
+                  value={exp.organization}
+                  onChange={(e) => handleChange(e, "experiences", index)}
+                  className="form-control"
+                  placeholder="Company name"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Location</label>
+                <input
+                  type="text"
+                  name="location"
+                  value={exp.location}
+                  onChange={(e) => handleChange(e, "experiences", index)}
+                  className="form-control"
+                  placeholder="City, Country"
+                />
+              </div>
+            </div>
+
+            <div className="form-grid cols-3">
+              <div className="form-group">
+                <label className="form-label">Start Date*</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={exp.startDate}
+                  onChange={(e) => handleChange(e, "experiences", index)}
+                  className="form-control"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">End Date</label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={exp.endDate}
+                  onChange={(e) => handleChange(e, "experiences", index)}
+                  className="form-control"
+                  placeholder="Present if current"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea
+                  name="description"
+                  value={exp.description}
+                  onChange={(e) => handleChange(e, "experiences", index)}
+                  className="form-control"
+                  placeholder="Your responsibilities and achievements"
+                  rows="3"
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="remove-btn"
+              onClick={() => removeEntry("experiences", index)}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Education Section */}
+      <div className="form-section">
+        <div className="section-header">
+          <h3 className="section-title">Education</h3>
+          <button
+            type="button"
+            className="add-btn"
+            onClick={() =>
+              addEntry("education", {
+                school: "",
+                degree: "",
+                city: "",
+                startDate: "",
+                graduationDate: "",
+                description: "",
+              })
+            }
+          >
+            + Add Education
+          </button>
+        </div>
+
+        {formData.education.map((edu, index) => (
+          <div key={index} className="form-row">
+            <div className="form-grid cols-3">
+              <div className="form-group">
+                <label className="form-label">School*</label>
+                <input
+                  type="text"
+                  name="school"
+                  value={edu.school}
+                  onChange={(e) => handleChange(e, "education", index)}
+                  className="form-control"
+                  placeholder="University name"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Degree*</label>
+                <input
+                  type="text"
+                  name="degree"
+                  value={edu.degree}
+                  onChange={(e) => handleChange(e, "education", index)}
+                  className="form-control"
+                  placeholder="Bachelor of Science"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">City</label>
+                <input
+                  type="text"
+                  name="city"
+                  value={edu.city}
+                  onChange={(e) => handleChange(e, "education", index)}
+                  className="form-control"
+                  placeholder="City, Country"
+                />
+              </div>
+            </div>
+
+            <div className="form-grid cols-3">
+              <div className="form-group">
+                <label className="form-label">Start Date*</label>
+                <input
+                  type="date"
+                  name="startDate"
+                  value={edu.startDate}
+                  onChange={(e) => handleChange(e, "education", index)}
+                  className="form-control"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Graduation Date*</label>
+                <input
+                  type="date"
+                  name="graduationDate"
+                  value={edu.graduationDate}
+                  onChange={(e) => handleChange(e, "education", index)}
+                  className="form-control"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea
+                  name="description"
+                  value={edu.description}
+                  onChange={(e) => handleChange(e, "education", index)}
+                  className="form-control"
+                  placeholder="Notable achievements or coursework"
+                  rows="3"
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="remove-btn"
+              onClick={() => removeEntry("education", index)}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Projects Section */}
+      <div className="form-section">
+        <div className="section-header">
+          <h3 className="section-title">Projects</h3>
+          <button
+            type="button"
+            className="add-btn"
+            onClick={() =>
+              addEntry("projects", {
+                title: "",
+                link: "",
+                description: "",
+              })
+            }
+          >
+            + Add Project
+          </button>
+        </div>
+
+        {formData.projects.map((project, index) => (
+          <div key={index} className="form-row">
+            <div className="form-grid cols-3">
+              <div className="form-group">
+                <label className="form-label">Project Name*</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={project.title}
+                  onChange={(e) => handleChange(e, "projects", index)}
+                  className="form-control"
+                  placeholder="Project title"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Project Link</label>
+                <input
+                  type="url"
+                  name="link"
+                  value={project.link}
+                  onChange={(e) => handleChange(e, "projects", index)}
+                  className="form-control"
+                  placeholder="https://example.com"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description*</label>
+                <textarea
+                  name="description"
+                  value={project.description}
+                  onChange={(e) => handleChange(e, "projects", index)}
+                  className="form-control"
+                  placeholder="Project details and your contributions"
+                  rows="3"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="remove-btn"
+              onClick={() => removeEntry("projects", index)}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Skills Section */}
+      <div className="form-section">
+        <div className="section-header">
+          <h3 className="section-title">Skills</h3>
+          <button
+            type="button"
+            className="add-btn"
+            onClick={() => addEntry("skills", { name: "" })}
+          >
+            + Add Skill
+          </button>
+        </div>
+
+        <div className="skills-container">
           {formData.skills.map((skill, index) => (
-            <span key={index} className="skill-tag">
-              {skill}
+            <div key={index} className="skill-item">
+              <input
+                type="text"
+                name="name"
+                value={skill.name}
+                onChange={(e) => handleChange(e, "skills", index)}
+                className="form-control skill-input"
+                placeholder="Skill name"
+              />
               <button
-                onClick={() => {
-                  const updatedSkills = [...formData.skills];
-                  updatedSkills.splice(index, 1);
-                  setFormData({ ...formData, skills: updatedSkills });
-                }}
+                type="button"
+                className="remove-skill-btn"
+                onClick={() => removeEntry("skills", index)}
               >
                 ×
               </button>
-            </span>
+            </div>
           ))}
         </div>
       </div>
 
-      <div className="save-section">
-        <button onClick={handleSave}>Save</button>
+      <div className="form-actions">
+        <button type="button" className="submit-btn">
+          Save Resume
+        </button>
+        <button type="button" className="reset-btn">
+          Reset Form
+        </button>
       </div>
     </div>
   );
 };
 
-export default Form;
+export default ResumeForm;

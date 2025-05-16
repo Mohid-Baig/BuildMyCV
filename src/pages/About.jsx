@@ -1,11 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../Components/About.css";
-import team1 from "../assets/images/mohid.jpg";
-import team2 from "../assets/images/soban.jpg";
-import TiltedCard from "../Components/Animation/Card";
 
 const About = () => {
-  const [expandedCard, setExpandedCard] = useState(null);
+  const [activeModal, setActiveModal] = useState(null);
 
   const teamMembers = [
     {
@@ -14,7 +11,6 @@ const About = () => {
       role: "React Specialist",
       rollNo: "2233132",
       bio: "Frontend expert with strong skills in React.js and UI/UX design. Responsible for the interactive components and smooth user experience of BuildMyCV.",
-      image: team1,
     },
     {
       id: 2,
@@ -22,12 +18,49 @@ const About = () => {
       role: "Web Developer",
       rollNo: "2233206",
       bio: "Full-stack developer specializing in web technologies. Handled the core functionality and integration aspects of BuildMyCV.",
-      image: team2,
     },
   ];
 
-  const toggleExpand = (id) => {
-    setExpandedCard(expandedCard === id ? null : id);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (event.target.classList.contains("member-modal")) {
+        setActiveModal(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    if (activeModal !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "auto";
+    };
+  }, [activeModal]);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setActiveModal(null);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  const openModal = (id) => {
+    setActiveModal(id);
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
   };
 
   return (
@@ -36,46 +69,83 @@ const About = () => {
         <h1>
           About <span>BuildMyCV</span>
         </h1>
-        <p className="university-badge">
+        <div className="university-badge">
           National College of Business Administration and Economics
-        </p>
+        </div>
         <p className="about-description">
           A professional resume builder created by 4th Semester Computer Science
           students
         </p>
       </div>
 
-      <div className="team-cards-container">
-        {teamMembers.map((member) => (
-          <div
-            key={member.id}
-            className={`team-member-card ${
-              expandedCard === member.id ? "expanded" : ""
-            }`}
-            onClick={() => toggleExpand(member.id)}
-          >
-            <div className="tilted-card-wrapper">
-              <TiltedCard
-                imageSrc={member.image}
-                captionText={`${member.name} - ${member.role}`}
-              />
-            </div>
+      <div className="team-section">
+        <h2 className="team-heading">Our Team</h2>
 
-            {expandedCard === member.id && (
-              <div className="member-details">
-                <h3>{member.name}</h3>
-                <p className="role">{member.role}</p>
-                <p className="roll-no">Roll No: {member.rollNo}</p>
-                <p className="bio">{member.bio}</p>
-                <div className="university-info">
-                  <p>NCBA&E - Computer Science</p>
-                  <p>4th Semester</p>
-                </div>
+        <div className="team-grid">
+          {teamMembers.map((member) => (
+            <div
+              key={member.id}
+              className="team-card"
+              onClick={() => openModal(member.id)}
+            >
+              <div className="member-initials">
+                {member.name
+                  .split(" ")
+                  .map((name) => name[0])
+                  .join("")}
               </div>
-            )}
-          </div>
-        ))}
+              <div className="member-info">
+                <h3>{member.name}</h3>
+                <p className="member-role">{member.role}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Member Modals */}
+      {teamMembers.map((member) => (
+        <div
+          key={`modal-${member.id}`}
+          className={`member-modal ${
+            activeModal === member.id ? "active" : ""
+          }`}
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <div className="modal-header-initials">
+                {member.name
+                  .split(" ")
+                  .map((name) => name[0])
+                  .join("")}
+              </div>
+              <div className="modal-header-info">
+                <h3>{member.name}</h3>
+                <p className="modal-role">{member.role}</p>
+                <p className="modal-roll">Roll No: {member.rollNo}</p>
+              </div>
+            </div>
+            <div className="modal-body">
+              <div className="modal-bio">
+                <p>{member.bio}</p>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <p>NCBA&E - Computer Science</p>
+              <p>4th Semester</p>
+            </div>
+            <div
+              className="modal-close"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeModal();
+              }}
+            >
+              <span>×</span>
+            </div>
+          </div>
+        </div>
+      ))}
 
       <div className="project-info">
         <h2>About The Project</h2>
