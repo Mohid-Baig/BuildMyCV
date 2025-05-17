@@ -32,7 +32,12 @@ const Home = () => {
         </motion.button>
 
         <div className="trust-badge">
-          <span>Trusted by -xMXHID</span>
+          <span>
+            Trusted by{" "}
+            <a href="https://mohid-baig.vercel.app/" style={{ color: "#fff" }}>
+              -xMXHID
+            </a>
+          </span>
         </div>
       </motion.div>
     </div>

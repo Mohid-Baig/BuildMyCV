@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern Light Resume</title>
+    <style>
+      /* GLOBAL STYLES */
+      :root {
+        /* Main Colors - Lighter Theme */
+        --color-primary: #5c6bc0;
+        --color-secondary: #42a5f5;
+        --color-accent: #f1f8ff;
+        --color-background: #ffffff;
+        --color-card: #f9fbfe;
+        --color-text-dark: #2a3042;
+        --color-text-medium: #505a74;
+        --color-text-light: #8896b8;
+        --color-white: #ffffff;
+        --color-border: #e6eef7;
+
+        /* Font Sizes */
+        --text-xs: 0.75rem;
+        --text-sm: 0.875rem;
+        --text-base: 1rem;
+        --text-lg: 1.125rem;
+        --text-xl: 1.25rem;
+        --text-2xl: 1.5rem;
+        --text-3xl: 1.875rem;
+
+        /* Spacing */
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+        --space-2xl: 3rem;
+
+        /* Shadows */
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
+          0 4px 6px -2px rgba(0, 0, 0, 0.03);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.04),
+          0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial,
+          sans-serif;
+        background-color: var(--color-background);
+        color: var(--color-text-dark);
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: var(--space-lg);
+      }
+
+      @media print {
+        body {
+          padding: 0;
+          background: white;
+        }
+        .resume {
+          box-shadow: none;
+          max-width: 100%;
+          margin: 0;
+          border-radius: 0;
+        }
+      }
+
+      /* RESUME CONTAINER */
+      .resume {
+        width: 100%;
+        max-width: 850px;
+        background: var(--color-background);
+        border-radius: 16px;
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      /* HEADER SECTION */
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--color-primary) 0%,
+          var(--color-secondary) 100%
+        );
+        padding: var(--space-xl) var(--space-2xl);
+        color: var(--color-white);
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: var(--space-xl);
+      }
+
+      .header-content {
+        flex: 1;
+      }
+
+      .profile-image-container {
+        position: relative;
+        z-index: 2;
+      }
+
+      .profile-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 16px;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .header-name {
+        font-size: var(--text-3xl);
+        font-weight: 700;
+        margin-bottom: var(--space-xs);
+        letter-spacing: -0.5px;
+      }
+
+      .header-title {
+        font-size: var(--text-lg);
+        font-weight: 500;
+        margin-bottom: var(--space-md);
+        opacity: 0.9;
+      }
+
+      .contact-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-lg);
+      }
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        font-size: var(--text-sm);
+      }
+
+      .contact-icon {
+        margin-right: var(--space-sm);
+        opacity: 0.9;
+        font-size: var(--text-lg);
+      }
+
+      /* MAIN CONTENT */
+      .main-content {
+        padding: var(--space-2xl);
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: var(--space-2xl);
+      }
+
+      /* SECTION STYLING */
+      .content-section {
+        margin-bottom: var(--space-xl);
+      }
+
+      .section-title {
+        font-size: var(--text-xl);
+        color: var(--color-primary);
+        margin-bottom: var(--space-lg);
+        font-weight: 600;
+        position: relative;
+        padding-bottom: var(--space-sm);
+      }
+
+      .section-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(
+          to right,
+          var(--color-primary),
+          var(--color-secondary)
+        );
+        border-radius: 3px;
+      }
+
+      /* ABOUT ME SECTION */
+      .about-me {
+        font-size: var(--text-base);
+        color: var(--color-text-medium);
+        line-height: 1.8;
+        margin-bottom: var(--space-xl);
+        padding: var(--space-lg);
+        background-color: var(--color-card);
+        border-radius: 12px;
+        border: 1px solid var(--color-border);
+      }
+
+      /* EXPERIENCE & EDUCATION */
+      .experience-card,
+      .education-card {
+        background-color: var(--color-card);
+        border-radius: 12px;
+        padding: var(--space-lg);
+        margin-bottom: var(--space-lg);
+        border: 1px solid var(--color-border);
+        position: relative;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .experience-card:hover,
+      .education-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .experience-header,
+      .education-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: var(--space-sm);
+      }
+
+      .job-title,
+      .degree {
+        font-size: var(--text-lg);
+        font-weight: 600;
+        color: var(--color-text-dark);
+      }
+
+      .job-duration,
+      .education-duration {
+        font-size: var(--text-xs);
+        color: var(--color-text-light);
+        background-color: var(--color-accent);
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+      }
+
+      .company-name,
+      .institution-name {
+        font-size: var(--text-base);
+        color: var(--color-text-medium);
+        margin-bottom: var(--space-md);
+        display: flex;
+        align-items: center;
+      }
+
+      .company-icon,
+      .institution-icon {
+        margin-right: var(--space-sm);
+        color: var(--color-secondary);
+      }
+
+      .job-description {
+        list-style: none;
+      }
+
+      .job-description li {
+        position: relative;
+        padding-left: var(--space-lg);
+        margin-bottom: var(--space-sm);
+        color: var(--color-text-medium);
+      }
+
+      .job-description li::before {
+        content: "→";
+        position: absolute;
+        left: 0;
+        color: var(--color-secondary);
+      }
+
+      /* SKILLS SECTION */
+      .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        margin-bottom: var(--space-lg);
+      }
+
+      .skill-tag {
+        background-color: var(--color-accent);
+        color: var(--color-primary);
+        font-size: var(--text-sm);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        display: inline-block;
+        font-weight: 500;
+        transition: transform 0.2s ease;
+      }
+
+      .skill-tag:hover {
+        transform: translateY(-2px);
+      }
+
+      /* LANGUAGES SECTION */
+      .language-item {
+        margin-bottom: var(--space-md);
+      }
+
+      .language-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: var(--space-xs);
+      }
+
+      .language-name {
+        font-weight: 500;
+        color: var(--color-text-medium);
+      }
+
+      .language-level {
+        font-size: var(--text-xs);
+        color: var(--color-text-light);
+      }
+
+      .language-bar {
+        height: 6px;
+        background-color: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .language-progress {
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          var(--color-primary),
+          var(--color-secondary)
+        );
+        border-radius: 3px;
+      }
+
+      /* HOBBIES SECTION */
+      .hobbies-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-md);
+      }
+
+      .hobby-item {
+        display: flex;
+        align-items: center;
+        background-color: var(--color-accent);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: var(--text-sm);
+        color: var(--color-text-medium);
+        font-weight: 500;
+      }
+
+      .hobby-icon {
+        margin-right: var(--space-sm);
+        color: var(--color-secondary);
+      }
+
+      /* RESPONSIVE DESIGN */
+      @media (max-width: 768px) {
+        .main-content {
+          grid-template-columns: 1fr;
+          gap: var(--space-xl);
+        }
+
+        .header {
+          flex-direction: column;
+          text-align: center;
+          padding: var(--space-lg);
+        }
+
+        .contact-bar {
+          justify-content: center;
+        }
+
+        .profile-image {
+          width: 100px;
+          height: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="resume">
+      <!-- Header Section -->
+      <div class="header">
+        <div class="profile-image-container">
+          <img
+            src="/api/placeholder/120/120"
+            alt="Profile Photo"
+            class="profile-image"
+          />
+        </div>
+        <div class="header-content">
+          <h1 class="header-name">Your Name</h1>
+          <p class="header-title">Front-End Developer</p>
+          <div class="contact-bar">
+            <div class="contact-item">
+              <span class="contact-icon">📱</span>
+              <span>+1 2345 6789</span>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">📧</span>
+              <span>example@gmail.com</span>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">📍</span>
+              <span>New York, NY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Left Column -->
+        <div class="main-column">
+          <!-- About Me -->
+          <div class="content-section">
+            <h2 class="section-title">About Me</h2>
+            <div class="about-me">
+              Creative and detail-oriented Front-End Developer with a passion
+              for responsive design and a firm believer in the mobile-first
+              approach. I combine technical expertise with an eye for design to
+              create engaging and intuitive user experiences. I stay current
+              with emerging technologies and industry trends to deliver modern
+              and innovative solutions.
+            </div>
+          </div>
+
+          <!-- Work Experience -->
+          <div class="content-section">
+            <h2 class="section-title">Experience</h2>
+
+            <div class="experience-card">
+              <div class="experience-header">
+                <h3 class="job-title">Lead Front-End Developer</h3>
+                <span class="job-duration">2023 - Present</span>
+              </div>
+              <p class="company-name">
+                <span class="company-icon">🏢</span>
+                TechSolutions Inc.
+              </p>
+              <ul class="job-description">
+                <li>
+                  Led the development of the company's flagship web application
+                  using React and Next.js
+                </li>
+                <li>
+                  Implemented responsive designs that improved mobile user
+                  engagement by 45%
+                </li>
+                <li>
+                  Mentored junior developers and conducted code reviews to
+                  ensure high code quality
+                </li>
+                <li>
+                  Collaborated with UX/UI designers to create seamless user
+                  experiences
+                </li>
+              </ul>
+            </div>
+
+            <div class="experience-card">
+              <div class="experience-header">
+                <h3 class="job-title">Front-End Developer</h3>
+                <span class="job-duration">2021 - 2023</span>
+              </div>
+              <p class="company-name">
+                <span class="company-icon">🏢</span>
+                WebCraft Studios
+              </p>
+              <ul class="job-description">
+                <li>
+                  Developed and maintained multiple client websites using HTML5,
+                  CSS3, and JavaScript
+                </li>
+                <li>
+                  Built reusable components and front-end libraries for future
+                  use
+                </li>
+                <li>
+                  Optimized applications for maximum speed and scalability
+                </li>
+                <li>
+                  Collaborated with back-end developers to integrate user-facing
+                  elements with server-side logic
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Education -->
+          <div class="content-section">
+            <h2 class="section-title">Education</h2>
+
+            <div class="education-card">
+              <div class="education-header">
+                <h3 class="degree">M.S. in Computer Science</h3>
+                <span class="education-duration">2019 - 2021</span>
+              </div>
+              <p class="institution-name">
+                <span class="institution-icon">🎓</span>
+                Tech University
+              </p>
+            </div>
+
+            <div class="education-card">
+              <div class="education-header">
+                <h3 class="degree">B.S. in Web Development</h3>
+                <span class="education-duration">2015 - 2019</span>
+              </div>
+              <p class="institution-name">
+                <span class="institution-icon">🎓</span>
+                State University
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="side-column">
+          <!-- Skills -->
+          <div class="content-section">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-container">
+              <span class="skill-tag">HTML5</span>
+              <span class="skill-tag">CSS3/SASS</span>
+              <span class="skill-tag">JavaScript</span>
+              <span class="skill-tag">TypeScript</span>
+              <span class="skill-tag">React.js</span>
+              <span class="skill-tag">Next.js</span>
+              <span class="skill-tag">Tailwind CSS</span>
+              <span class="skill-tag">Responsive Design</span>
+              <span class="skill-tag">UI/UX Principles</span>
+              <span class="skill-tag">Webpack</span>
+              <span class="skill-tag">Git</span>
+              <span class="skill-tag">REST APIs</span>
+            </div>
+          </div>
+
+          <!-- Languages -->
+          <div class="content-section">
+            <h2 class="section-title">Languages</h2>
+
+            <div class="language-item">
+              <div class="language-info">
+                <span class="language-name">English</span>
+                <span class="language-level">Native</span>
+              </div>
+              <div class="language-bar">
+                <div class="language-progress" style="width: 100%"></div>
+              </div>
+            </div>
+
+            <div class="language-item">
+              <div class="language-info">
+                <span class="language-name">Spanish</span>
+                <span class="language-level">Advanced</span>
+              </div>
+              <div class="language-bar">
+                <div class="language-progress" style="width: 80%"></div>
+              </div>
+            </div>
+
+            <div class="language-item">
+              <div class="language-info">
+                <span class="language-name">French</span>
+                <span class="language-level">Intermediate</span>
+              </div>
+              <div class="language-bar">
+                <div class="language-progress" style="width: 60%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Certifications -->
+          <div class="content-section">
+            <h2 class="section-title">Certifications</h2>
+            <div class="education-card">
+              <h3 class="degree">Advanced React Developer</h3>
+              <p class="institution-name">
+                <span class="institution-icon">🏆</span>
+                Frontend Masters (2022)
+              </p>
+            </div>
+            <div class="education-card">
+              <h3 class="degree">UI/UX Design Fundamentals</h3>
+              <p class="institution-name">
+                <span class="institution-icon">🏆</span>
+                Design Academy (2021)
+              </p>
+            </div>
+          </div>
+
+          <!-- Hobbies -->
+          <div class="content-section">
+            <h2 class="section-title">Hobbies</h2>
+            <div class="hobbies-container">
+              <div class="hobby-item">
+                <span class="hobby-icon">🏃</span>
+                <span>Running</span>
+              </div>
+              <div class="hobby-item">
+                <span class="hobby-icon">📚</span>
+                <span>Reading</span>
+              </div>
+              <div class="hobby-item">
+                <span class="hobby-icon">🎸</span>
+                <span>Guitar</span>
+              </div>
+              <div class="hobby-item">
+                <span class="hobby-icon">✈️</span>
+                <span>Travel</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
