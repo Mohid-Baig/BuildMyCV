@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import for navigation
 import "../Components/Templates.css";
 import template1 from "../assets/images/tp1.jpeg";
 import template2 from "../assets/images/tp2.jpeg";
@@ -8,12 +9,33 @@ import template4 from "../assets/images/tp4.jpeg";
 const Templates = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const modalRef = useRef(null);
+  const navigate = useNavigate(); // Hook for navigation
 
   const templates = [
-    { id: 1, name: "Modern Professional", image: template1 },
-    { id: 2, name: "Creative Designer", image: template2 },
-    { id: 3, name: "Minimalist", image: template3 },
-    { id: 4, name: "Executive", image: template4 },
+    {
+      id: 1,
+      name: "Modern Professional",
+      image: template1,
+      path: "/template1", // Path to redirect to for this template
+    },
+    {
+      id: 2,
+      name: "Creative Designer",
+      image: template2,
+      path: "/template2",
+    },
+    {
+      id: 3,
+      name: "Minimalist",
+      image: template3,
+      path: "/template3",
+    },
+    {
+      id: 4,
+      name: "Executive",
+      image: template4,
+      path: "/template4",
+    },
   ];
 
   const handleTemplateClick = (id, e) => {
@@ -23,6 +45,15 @@ const Templates = () => {
 
   const handleCloseTemplate = () => {
     setSelectedTemplate(null);
+  };
+
+  // Function to navigate to the selected template page
+  const navigateToTemplate = (templateId) => {
+    const template = templates.find((t) => t.id === templateId);
+    if (template) {
+      console.log(`Navigating to template: ${template.path}`);
+      navigate(template.path); // Navigate to the template route
+    }
   };
 
   // Close modal when Escape key is pressed
@@ -83,8 +114,8 @@ const Templates = () => {
               className="use-template-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                // Handle template selection
-                console.log(`Selected template: ${selectedTemplate}`);
+                // Navigate to the selected template page
+                navigateToTemplate(selectedTemplate);
               }}
             >
               Use This Template
