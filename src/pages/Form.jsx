@@ -122,7 +122,6 @@ const ResumeForm = () => {
       return;
     }
 
-    // Save to localStorage
     localStorage.setItem("resumeData", JSON.stringify(formData));
     alert("Resume saved successfully!");
   };

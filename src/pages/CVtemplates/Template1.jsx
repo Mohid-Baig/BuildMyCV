@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
+import baseStyles from "./temp1base";
 
 const Resume1 = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const [resumeData, setResumeData] = useState(null);
+  const [hasLocalData, setHasLocalData] = useState(false);
+
+  // Check for saved data in localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem("resumeData");
+    if (savedData) {
+      setResumeData(JSON.parse(savedData));
+      setHasLocalData(true);
+    }
+  }, []);
 
   // Handle responsive layout
   useEffect(() => {
@@ -9,53 +21,87 @@ const Resume1 = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    // Set initial value
     handleResize();
-
-    // Add event listener
     window.addEventListener("resize", handleResize);
-
-    // Clean up
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Base styles
-  const baseStyles = {
-    // GLOBAL STYLES
-    mainColors: {
-      "--color-primary": "#2c3e50",
-      "--color-secondary": "#3498db",
-      "--color-background": "#f9f9f9",
-      "--color-text-dark": "#2c3e50",
-      "--color-text-medium": "#546e7a",
-      "--color-text-light": "#78909c",
-      "--color-white": "#ffffff",
+  // Static fallback data
+  const staticData = {
+    personalInfo: {
+      firstName: "Your",
+      lastName: "Name",
+      designation: "Software Engineer",
+      address: "#1 road, city/state-0011",
+      email: "example@gmail.com",
+      phone: "+1 2345 6789",
+      summary:
+        "I am a software engineer with experience in a variety of programming languages and a track record of delivering high-quality code. I am skilled in problem-solving and have a strong background in computer science. I am a strong communicator and enjoy working collaboratively with others.",
+      imagePreview: "/api/placeholder/160/160",
     },
-    fontSizes: {
-      "--text-xs": "0.75rem",
-      "--text-sm": "0.875rem",
-      "--text-base": "1rem",
-      "--text-lg": "1.125rem",
-      "--text-xl": "1.25rem",
-      "--text-2xl": "1.5rem",
-      "--text-3xl": "1.875rem",
-    },
-    spacing: {
-      "--space-xs": "0.25rem",
-      "--space-sm": "0.5rem",
-      "--space-md": "1rem",
-      "--space-lg": "1.5rem",
-      "--space-xl": "2rem",
-      "--space-2xl": "3rem",
-    },
-    shadows: {
-      "--shadow-sm": "0 1px 2px rgba(0, 0, 0, 0.05)",
-      "--shadow-md": "0 4px 6px rgba(0, 0, 0, 0.1)",
-      "--shadow-lg":
-        "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-      "--shadow-xl":
-        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-    },
+    skills: [
+      { name: "SQL Database Management", proficiency: "80" },
+      { name: "Linux/Unix Command line", proficiency: "75" },
+      { name: "Python", proficiency: "85" },
+      { name: "C++", proficiency: "70" },
+      { name: "JAVA", proficiency: "75" },
+    ],
+    languages: [
+      { name: "English", proficiency: "Proficient" },
+      { name: "Hindi", proficiency: "Proficient" },
+    ],
+    experiences: [
+      {
+        title: "Senior Software Developer",
+        organization: "Company",
+        location: "Country",
+        startDate: "2022-01-01",
+        endDate: "2023-12-31",
+        current: false,
+        description:
+          "Developed and maintained software using Java, Python, and C++\nLed cross-functional teams to deliver successful software projects\nDesigned and implemented scalable architecture for enterprise applications",
+      },
+      {
+        title: "Web Developer",
+        organization: "Company",
+        location: "Country",
+        startDate: "2021-01-01",
+        endDate: "2021-12-31",
+        current: false,
+        description:
+          "Developed and maintained various web applications using languages such as HTML, CSS, JavaScript, and PHP\nWorked with cross-functional teams to gather requirements and design user interfaces",
+      },
+    ],
+    education: [
+      {
+        school: "XYX University",
+        degree: "Masters in Software Engineering",
+        field: "Software Engineering",
+        city: "Bangalore",
+        startDate: "2019-01-01",
+        graduationDate: "2020-12-31",
+        description: "",
+      },
+      {
+        school: "XYX University",
+        degree: "Bachelor in Computer Science",
+        field: "Computer Science",
+        city: "Bangalore",
+        startDate: "2015-01-01",
+        graduationDate: "2018-12-31",
+        description: "",
+      },
+    ],
+  };
+
+  // Use local data if available, otherwise use static data
+  const data = hasLocalData ? resumeData : staticData;
+
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const options = { year: "numeric", month: "short" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   // Combine all CSS variables
@@ -64,6 +110,18 @@ const Resume1 = () => {
     ...baseStyles.fontSizes,
     ...baseStyles.spacing,
     ...baseStyles.shadows,
+  };
+
+  // Only render section if it has data
+  const renderSection = (sectionData, renderFunction) => {
+    if (Array.isArray(sectionData)) {
+      return sectionData.length > 0 ? renderFunction() : null;
+    } else if (typeof sectionData === "object" && sectionData !== null) {
+      return Object.values(sectionData).some((val) => val)
+        ? renderFunction()
+        : null;
+    }
+    return sectionData ? renderFunction() : null;
   };
 
   return (
@@ -126,8 +184,10 @@ const Resume1 = () => {
               }}
             >
               <img
-                src="/api/placeholder/160/160"
-                alt="Profile Photo"
+                src={
+                  data.personalInfo.imagePreview || "/api/placeholder/160/160"
+                }
+                alt="Profile"
                 style={{
                   width: isMobile ? "120px" : "160px",
                   height: isMobile ? "120px" : "160px",
@@ -147,7 +207,11 @@ const Resume1 = () => {
                   margin: "0 0 var(--space-sm) 0",
                 }}
               >
-                Your Name
+                {`${data.personalInfo.firstName} ${
+                  data.personalInfo.middleName
+                    ? data.personalInfo.middleName + " "
+                    : ""
+                }${data.personalInfo.lastName}`}
               </h1>
               <p
                 style={{
@@ -159,7 +223,7 @@ const Resume1 = () => {
                   margin: 0,
                 }}
               >
-                Software Engineer
+                {data.personalInfo.designation}
               </p>
             </div>
 
@@ -174,385 +238,431 @@ const Resume1 = () => {
             ></div>
 
             {/* Contact Information */}
-            <div
-              style={{
-                marginBottom: "var(--space-xl)",
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
-              <h2
+            {renderSection(data.personalInfo, () => (
+              <div
                 style={{
-                  fontSize: "var(--text-lg)",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "var(--space-lg)",
-                  paddingBottom: "var(--space-sm)",
+                  marginBottom: "var(--space-xl)",
                   position: "relative",
-                  margin: "0 0 var(--space-lg) 0",
+                  zIndex: 1,
                 }}
               >
-                Contact
-                <div
+                <h2
                   style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "30px",
-                    height: "2px",
-                    backgroundColor: "var(--color-secondary)",
-                  }}
-                ></div>
-              </h2>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                }}
-              >
-                <li
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "var(--space-md)",
-                    transition: "transform 0.2s ease",
+                    fontSize: "var(--text-lg)",
+                    textTransform: "uppercase",
+                    letterSpacing: "2px",
+                    marginBottom: "var(--space-lg)",
+                    paddingBottom: "var(--space-sm)",
+                    position: "relative",
+                    margin: "0 0 var(--space-lg) 0",
                   }}
                 >
+                  Contact
                   <div
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      width: "30px",
+                      height: "2px",
+                      backgroundColor: "var(--color-secondary)",
+                    }}
+                  ></div>
+                </h2>
+                <ul
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
+                  }}
+                >
+                  <li
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      width: "28px",
-                      height: "28px",
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      borderRadius: "50%",
-                      marginRight: "var(--space-md)",
-                      fontSize: "var(--text-sm)",
+                      marginBottom: "var(--space-md)",
+                      transition: "transform 0.2s ease",
                     }}
                   >
-                    📱
-                  </div>
-                  <span
-                    style={{
-                      fontSize: "var(--text-sm)",
-                    }}
-                  >
-                    +1 2345 6789
-                  </span>
-                </li>
-                <li
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "var(--space-md)",
-                    transition: "transform 0.2s ease",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "28px",
-                      height: "28px",
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      borderRadius: "50%",
-                      marginRight: "var(--space-md)",
-                      fontSize: "var(--text-sm)",
-                    }}
-                  >
-                    📧
-                  </div>
-                  <span
-                    style={{
-                      fontSize: "var(--text-sm)",
-                    }}
-                  >
-                    example@gmail.com
-                  </span>
-                </li>
-                <li
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginBottom: "var(--space-md)",
-                    transition: "transform 0.2s ease",
-                  }}
-                >
-                  <div
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "28px",
+                        height: "28px",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: "50%",
+                        marginRight: "var(--space-md)",
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      📱
+                    </div>
+                    <span
+                      style={{
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      {data.personalInfo.phone}
+                    </span>
+                  </li>
+                  <li
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      width: "28px",
-                      height: "28px",
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                      borderRadius: "50%",
-                      marginRight: "var(--space-md)",
-                      fontSize: "var(--text-sm)",
+                      marginBottom: "var(--space-md)",
+                      transition: "transform 0.2s ease",
                     }}
                   >
-                    📍
-                  </div>
-                  <span
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "28px",
+                        height: "28px",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: "50%",
+                        marginRight: "var(--space-md)",
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      📧
+                    </div>
+                    <span
+                      style={{
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      {data.personalInfo.email}
+                    </span>
+                  </li>
+                  <li
                     style={{
-                      fontSize: "var(--text-sm)",
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "var(--space-md)",
+                      transition: "transform 0.2s ease",
                     }}
                   >
-                    #1 road, city/state-0011
-                  </span>
-                </li>
-              </ul>
-            </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "28px",
+                        height: "28px",
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: "50%",
+                        marginRight: "var(--space-md)",
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      📍
+                    </div>
+                    <span
+                      style={{
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      {data.personalInfo.address}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            ))}
 
             {/* Skills */}
-            <div
-              style={{
-                marginBottom: "var(--space-xl)",
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
-              <h2
+            {renderSection(data.skills, () => (
+              <div
                 style={{
-                  fontSize: "var(--text-lg)",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "var(--space-lg)",
-                  paddingBottom: "var(--space-sm)",
+                  marginBottom: "var(--space-xl)",
                   position: "relative",
-                  margin: "0 0 var(--space-lg) 0",
+                  zIndex: 1,
                 }}
               >
-                Skills
-                <div
+                <h2
                   style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "30px",
-                    height: "2px",
-                    backgroundColor: "var(--color-secondary)",
+                    fontSize: "var(--text-lg)",
+                    textTransform: "uppercase",
+                    letterSpacing: "2px",
+                    marginBottom: "var(--space-lg)",
+                    paddingBottom: "var(--space-sm)",
+                    position: "relative",
+                    margin: "0 0 var(--space-lg) 0",
                   }}
-                ></div>
-              </h2>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                }}
-              >
-                {[
-                  "SQL Database Management",
-                  "Linux/Unix Command line",
-                  "Python",
-                  "C++",
-                  "JAVA",
-                ].map((skill, index) => (
-                  <li
-                    key={index}
+                >
+                  Skills
+                  <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: "var(--space-sm)",
-                      transition: "transform 0.2s ease",
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      width: "30px",
+                      height: "2px",
+                      backgroundColor: "var(--color-secondary)",
                     }}
-                  >
-                    <span
+                  ></div>
+                </h2>
+                <ul
+                  style={{
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
+                  }}
+                >
+                  {data.skills.map((skill, index) => (
+                    <li
+                      key={index}
                       style={{
-                        display: "inline-block",
-                        width: "6px",
-                        height: "6px",
-                        backgroundColor: "var(--color-secondary)",
-                        borderRadius: "50%",
-                        marginRight: "var(--space-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "var(--space-sm)",
+                        transition: "transform 0.2s ease",
                       }}
-                    ></span>
-                    <span>{skill}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                    >
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: "6px",
+                          height: "6px",
+                          backgroundColor: "var(--color-secondary)",
+                          borderRadius: "50%",
+                          marginRight: "var(--space-md)",
+                        }}
+                      ></span>
+                      <span>{skill.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
             {/* Languages */}
-            <div
-              style={{
-                marginBottom: "var(--space-xl)",
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
-              <h2
+            {renderSection(data.languages, () => (
+              <div
                 style={{
-                  fontSize: "var(--text-lg)",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "var(--space-lg)",
-                  paddingBottom: "var(--space-sm)",
+                  marginBottom: "var(--space-xl)",
                   position: "relative",
-                  margin: "0 0 var(--space-lg) 0",
+                  zIndex: 1,
                 }}
               >
-                Languages
-                <div
+                <h2
                   style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "30px",
-                    height: "2px",
-                    backgroundColor: "var(--color-secondary)",
-                  }}
-                ></div>
-              </h2>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                }}
-              >
-                <li
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "var(--space-sm)",
-                    transition: "transform 0.2s ease",
+                    fontSize: "var(--text-lg)",
+                    textTransform: "uppercase",
+                    letterSpacing: "2px",
+                    marginBottom: "var(--space-lg)",
+                    paddingBottom: "var(--space-sm)",
+                    position: "relative",
+                    margin: "0 0 var(--space-lg) 0",
                   }}
                 >
+                  Languages
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      width: "30px",
+                      height: "2px",
+                      backgroundColor: "var(--color-secondary)",
                     }}
-                  >
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: "6px",
-                        height: "6px",
-                        backgroundColor: "var(--color-secondary)",
-                        borderRadius: "50%",
-                        marginRight: "var(--space-md)",
-                      }}
-                    ></span>
-                    <span>English</span>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: "var(--text-xs)",
-                      color: "rgba(255, 255, 255, 0.7)",
-                    }}
-                  >
-                    Proficient
-                  </span>
-                </li>
-                <li
+                  ></div>
+                </h2>
+                <ul
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: "var(--space-sm)",
-                    transition: "transform 0.2s ease",
+                    listStyle: "none",
+                    padding: 0,
+                    margin: 0,
                   }}
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span
+                  {data.languages.map((language, index) => (
+                    <li
+                      key={index}
                       style={{
-                        display: "inline-block",
-                        width: "6px",
-                        height: "6px",
-                        backgroundColor: "var(--color-secondary)",
-                        borderRadius: "50%",
-                        marginRight: "var(--space-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: "var(--space-sm)",
+                        transition: "transform 0.2s ease",
                       }}
-                    ></span>
-                    <span>Hindi</span>
-                  </div>
-                  <span
-                    style={{
-                      fontSize: "var(--text-xs)",
-                      color: "rgba(255, 255, 255, 0.7)",
-                    }}
-                  >
-                    Proficient
-                  </span>
-                </li>
-              </ul>
-            </div>
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-block",
+                            width: "6px",
+                            height: "6px",
+                            backgroundColor: "var(--color-secondary)",
+                            borderRadius: "50%",
+                            marginRight: "var(--space-md)",
+                          }}
+                        ></span>
+                        <span>{language.name}</span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "var(--text-xs)",
+                          color: "rgba(255, 255, 255, 0.7)",
+                        }}
+                      >
+                        {language.proficiency}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
-            {/* Hobbies */}
-            <div
-              style={{
-                marginBottom: "var(--space-xl)",
-                position: "relative",
-                zIndex: 1,
-              }}
-            >
-              <h2
-                style={{
-                  fontSize: "var(--text-lg)",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "var(--space-lg)",
-                  paddingBottom: "var(--space-sm)",
-                  position: "relative",
-                  margin: "0 0 var(--space-lg) 0",
-                }}
-              >
-                Hobbies
+            {/* Social Links - Only show if using local data and links exist */}
+            {hasLocalData &&
+              renderSection(data.socialLinks, () => (
                 <div
                   style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "30px",
-                    height: "2px",
-                    backgroundColor: "var(--color-secondary)",
+                    marginBottom: "var(--space-xl)",
+                    position: "relative",
+                    zIndex: 1,
                   }}
-                ></div>
-              </h2>
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                }}
-              >
-                {["Writing", "Cricket", "Music"].map((hobby, index) => (
-                  <li
-                    key={index}
+                >
+                  <h2
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginBottom: "var(--space-sm)",
-                      transition: "transform 0.2s ease",
+                      fontSize: "var(--text-lg)",
+                      textTransform: "uppercase",
+                      letterSpacing: "2px",
+                      marginBottom: "var(--space-lg)",
+                      paddingBottom: "var(--space-sm)",
+                      position: "relative",
+                      margin: "0 0 var(--space-lg) 0",
                     }}
                   >
-                    <span
+                    Online Presence
+                    <div
                       style={{
-                        display: "inline-block",
-                        width: "6px",
-                        height: "6px",
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: "30px",
+                        height: "2px",
                         backgroundColor: "var(--color-secondary)",
-                        borderRadius: "50%",
-                        marginRight: "var(--space-md)",
                       }}
-                    ></span>
-                    <span>{hobby}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+                    ></div>
+                  </h2>
+                  <ul
+                    style={{
+                      listStyle: "none",
+                      padding: 0,
+                      margin: 0,
+                    }}
+                  >
+                    {data.socialLinks.linkedin && (
+                      <li
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "var(--space-sm)",
+                          transition: "transform 0.2s ease",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-block",
+                            width: "6px",
+                            height: "6px",
+                            backgroundColor: "var(--color-secondary)",
+                            borderRadius: "50%",
+                            marginRight: "var(--space-md)",
+                          }}
+                        ></span>
+                        <a
+                          href={data.socialLinks.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: "var(--color-white)",
+                            textDecoration: "none",
+                            fontSize: "var(--text-sm)",
+                          }}
+                        >
+                          LinkedIn
+                        </a>
+                      </li>
+                    )}
+                    {data.socialLinks.github && (
+                      <li
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "var(--space-sm)",
+                          transition: "transform 0.2s ease",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-block",
+                            width: "6px",
+                            height: "6px",
+                            backgroundColor: "var(--color-secondary)",
+                            borderRadius: "50%",
+                            marginRight: "var(--space-md)",
+                          }}
+                        ></span>
+                        <a
+                          href={data.socialLinks.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: "var(--color-white)",
+                            textDecoration: "none",
+                            fontSize: "var(--text-sm)",
+                          }}
+                        >
+                          GitHub
+                        </a>
+                      </li>
+                    )}
+                    {data.socialLinks.portfolio && (
+                      <li
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          marginBottom: "var(--space-sm)",
+                          transition: "transform 0.2s ease",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-block",
+                            width: "6px",
+                            height: "6px",
+                            backgroundColor: "var(--color-secondary)",
+                            borderRadius: "50%",
+                            marginRight: "var(--space-md)",
+                          }}
+                        ></span>
+                        <a
+                          href={data.socialLinks.portfolio}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: "var(--color-white)",
+                            textDecoration: "none",
+                            fontSize: "var(--text-sm)",
+                          }}
+                        >
+                          Portfolio
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              ))}
           </div>
 
           {/* Main Content */}
@@ -565,442 +675,492 @@ const Resume1 = () => {
             }}
           >
             {/* About Me */}
-            <section>
-              <h2
-                style={{
-                  fontSize: "var(--text-2xl)",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "var(--space-lg)",
-                  position: "relative",
-                  paddingBottom: "var(--space-sm)",
-                  color: "var(--color-primary)",
-                  margin: "0 0 var(--space-lg) 0",
-                }}
-              >
-                Profile
-                <div
+            {renderSection(data.personalInfo.summary, () => (
+              <section>
+                <h2
                   style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "50px",
-                    height: "3px",
-                    backgroundColor: "var(--color-secondary)",
+                    fontSize: "var(--text-2xl)",
+                    textTransform: "uppercase",
+                    letterSpacing: "2px",
+                    marginBottom: "var(--space-lg)",
+                    position: "relative",
+                    paddingBottom: "var(--space-sm)",
+                    color: "var(--color-primary)",
+                    margin: "0 0 var(--space-lg) 0",
                   }}
-                ></div>
-              </h2>
-              <p
-                style={{
-                  fontSize: "var(--text-base)",
-                  color: "var(--color-text-medium)",
-                  lineHeight: 1.8,
-                  textAlign: "justify",
-                  margin: 0,
-                }}
-              >
-                I am a software engineer with experience in a variety of
-                programming languages and a track record of delivering
-                high-quality code. I am skilled in problem-solving and have a
-                strong background in computer science. I am a strong
-                communicator and enjoy working collaboratively with others.
-              </p>
-            </section>
+                >
+                  Profile
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 0,
+                      left: 0,
+                      width: "50px",
+                      height: "3px",
+                      backgroundColor: "var(--color-secondary)",
+                    }}
+                  ></div>
+                </h2>
+                <p
+                  style={{
+                    fontSize: "var(--text-base)",
+                    color: "var(--color-text-medium)",
+                    lineHeight: 1.8,
+                    textAlign: "justify",
+                    margin: 0,
+                    whiteSpace: "pre-line",
+                  }}
+                >
+                  {data.personalInfo.summary}
+                </p>
+              </section>
+            ))}
 
             {/* Work Experience */}
-            <section>
-              <h2
-                style={{
-                  fontSize: "var(--text-2xl)",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "var(--space-lg)",
-                  position: "relative",
-                  paddingBottom: "var(--space-sm)",
-                  color: "var(--color-primary)",
-                  margin: "0 0 var(--space-lg) 0",
-                }}
-              >
-                Work Experience
-                <div
+            {renderSection(data.experiences, () => (
+              <section>
+                <h2
                   style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "50px",
-                    height: "3px",
-                    backgroundColor: "var(--color-secondary)",
-                  }}
-                ></div>
-              </h2>
-
-              <div
-                style={{
-                  position: "relative",
-                }}
-              >
-                {/* Timeline vertical line */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    bottom: "10px",
-                    left: "8px",
-                    width: "2px",
-                    backgroundColor: "#e0e0e0",
-                  }}
-                ></div>
-
-                {/* Experience Item 1 */}
-                <div
-                  style={{
+                    fontSize: "var(--text-2xl)",
+                    textTransform: "uppercase",
+                    letterSpacing: "2px",
+                    marginBottom: "var(--space-lg)",
                     position: "relative",
-                    paddingLeft: "var(--space-xl)",
-                    marginBottom: "var(--space-xl)",
+                    paddingBottom: "var(--space-sm)",
+                    color: "var(--color-primary)",
+                    margin: "0 0 var(--space-lg) 0",
                   }}
                 >
+                  Work Experience
                   <div
                     style={{
                       position: "absolute",
-                      top: "5px",
+                      bottom: 0,
                       left: 0,
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--color-white)",
-                      border: "3px solid var(--color-secondary)",
-                      zIndex: 1,
+                      width: "50px",
+                      height: "3px",
+                      backgroundColor: "var(--color-secondary)",
                     }}
                   ></div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "var(--space-sm)",
-                    }}
-                  >
-                    <h3
-                      style={{
-                        fontSize: "var(--text-lg)",
-                        fontWeight: 600,
-                        color: "var(--color-text-dark)",
-                        margin: 0,
-                      }}
-                    >
-                      Senior Software Developer
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--color-text-light)",
-                      }}
-                    >
-                      Jan 2022 – Dec 2023
-                    </span>
-                  </div>
-                  <p
-                    style={{
-                      marginBottom: "var(--space-md)",
-                      color: "var(--color-text-medium)",
-                      fontStyle: "italic",
-                      margin: "0 0 var(--space-md) 0",
-                    }}
-                  >
-                    Company – Country
-                  </p>
-                  <ul
-                    style={{
-                      listStyle: "none",
-                      padding: 0,
-                      margin: 0,
-                    }}
-                  >
-                    {[
-                      "Developed and maintained software using Java, Python, and C++",
-                      "Led cross-functional teams to deliver successful software projects",
-                      "Designed and implemented scalable architecture for enterprise applications",
-                    ].map((item, index) => (
-                      <li
-                        key={index}
-                        style={{
-                          position: "relative",
-                          paddingLeft: "var(--space-lg)",
-                          marginBottom: "var(--space-sm)",
-                          color: "var(--color-text-medium)",
-                        }}
-                      >
-                        <span
-                          style={{
-                            position: "absolute",
-                            left: 0,
-                            color: "var(--color-secondary)",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          •
-                        </span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                </h2>
 
-                {/* Experience Item 2 */}
                 <div
                   style={{
                     position: "relative",
-                    paddingLeft: "var(--space-xl)",
-                    marginBottom: "var(--space-xl)",
                   }}
                 >
+                  {/* Timeline vertical line */}
                   <div
                     style={{
                       position: "absolute",
-                      top: "5px",
-                      left: 0,
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--color-white)",
-                      border: "3px solid var(--color-secondary)",
-                      zIndex: 1,
+                      top: "10px",
+                      bottom: "10px",
+                      left: "8px",
+                      width: "2px",
+                      backgroundColor: "#e0e0e0",
                     }}
                   ></div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "var(--space-sm)",
-                    }}
-                  >
-                    <h3
+
+                  {data.experiences.map((exp, index) => (
+                    <div
+                      key={index}
                       style={{
-                        fontSize: "var(--text-lg)",
-                        fontWeight: 600,
-                        color: "var(--color-text-dark)",
-                        margin: 0,
+                        position: "relative",
+                        paddingLeft: "var(--space-xl)",
+                        marginBottom: "var(--space-xl)",
                       }}
                     >
-                      Web Developer
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--color-text-light)",
-                      }}
-                    >
-                      Jan 2021 – Dec 2021
-                    </span>
-                  </div>
-                  <p
-                    style={{
-                      marginBottom: "var(--space-md)",
-                      color: "var(--color-text-medium)",
-                      fontStyle: "italic",
-                      margin: "0 0 var(--space-md) 0",
-                    }}
-                  >
-                    Company – Country
-                  </p>
-                  <ul
-                    style={{
-                      listStyle: "none",
-                      padding: 0,
-                      margin: 0,
-                    }}
-                  >
-                    {[
-                      "Developed and maintained various web applications using languages such as HTML, CSS, JavaScript, and PHP",
-                      "Worked with cross-functional teams to gather requirements and design user interfaces",
-                    ].map((item, index) => (
-                      <li
-                        key={index}
+                      <div
                         style={{
-                          position: "relative",
-                          paddingLeft: "var(--space-lg)",
+                          position: "absolute",
+                          top: "5px",
+                          left: 0,
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "50%",
+                          backgroundColor: "var(--color-white)",
+                          border: "3px solid var(--color-secondary)",
+                          zIndex: 1,
+                        }}
+                      ></div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
                           marginBottom: "var(--space-sm)",
-                          color: "var(--color-text-medium)",
                         }}
                       >
-                        <span
+                        <h3
                           style={{
-                            position: "absolute",
-                            left: 0,
-                            color: "var(--color-secondary)",
-                            fontWeight: "bold",
+                            fontSize: "var(--text-lg)",
+                            fontWeight: 600,
+                            color: "var(--color-text-dark)",
+                            margin: 0,
                           }}
                         >
-                          •
+                          {exp.title}
+                        </h3>
+                        <span
+                          style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--color-text-light)",
+                          }}
+                        >
+                          {formatDate(exp.startDate)} –{" "}
+                          {exp.current ? "Present" : formatDate(exp.endDate)}
                         </span>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
+                      </div>
+                      <p
+                        style={{
+                          marginBottom: "var(--space-md)",
+                          color: "var(--color-text-medium)",
+                          fontStyle: "italic",
+                          margin: "0 0 var(--space-md) 0",
+                        }}
+                      >
+                        {exp.organization} – {exp.location}
+                      </p>
+                      <ul
+                        style={{
+                          listStyle: "none",
+                          padding: 0,
+                          margin: 0,
+                        }}
+                      >
+                        {exp.description.split("\n").map((item, i) => (
+                          <li
+                            key={i}
+                            style={{
+                              position: "relative",
+                              paddingLeft: "var(--space-lg)",
+                              marginBottom: "var(--space-sm)",
+                              color: "var(--color-text-medium)",
+                            }}
+                          >
+                            <span
+                              style={{
+                                position: "absolute",
+                                left: 0,
+                                color: "var(--color-secondary)",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              •
+                            </span>
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </section>
+              </section>
+            ))}
 
             {/* Education */}
-            <section>
-              <h2
-                style={{
-                  fontSize: "var(--text-2xl)",
-                  textTransform: "uppercase",
-                  letterSpacing: "2px",
-                  marginBottom: "var(--space-lg)",
-                  position: "relative",
-                  paddingBottom: "var(--space-sm)",
-                  color: "var(--color-primary)",
-                  margin: "0 0 var(--space-lg) 0",
-                }}
-              >
-                Education
-                <div
+            {renderSection(data.education, () => (
+              <section>
+                <h2
                   style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    width: "50px",
-                    height: "3px",
-                    backgroundColor: "var(--color-secondary)",
-                  }}
-                ></div>
-              </h2>
-
-              <div
-                style={{
-                  position: "relative",
-                }}
-              >
-                {/* Timeline vertical line */}
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "10px",
-                    bottom: "10px",
-                    left: "8px",
-                    width: "2px",
-                    backgroundColor: "#e0e0e0",
-                  }}
-                ></div>
-
-                {/* Education Item 1 */}
-                <div
-                  style={{
+                    fontSize: "var(--text-2xl)",
+                    textTransform: "uppercase",
+                    letterSpacing: "2px",
+                    marginBottom: "var(--space-lg)",
                     position: "relative",
-                    paddingLeft: "var(--space-xl)",
-                    marginBottom: "var(--space-xl)",
+                    paddingBottom: "var(--space-sm)",
+                    color: "var(--color-primary)",
+                    margin: "0 0 var(--space-lg) 0",
                   }}
                 >
+                  Education
                   <div
                     style={{
                       position: "absolute",
-                      top: "5px",
+                      bottom: 0,
                       left: 0,
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--color-white)",
-                      border: "3px solid var(--color-secondary)",
-                      zIndex: 1,
+                      width: "50px",
+                      height: "3px",
+                      backgroundColor: "var(--color-secondary)",
                     }}
                   ></div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "var(--space-sm)",
-                    }}
-                  >
-                    <h3
-                      style={{
-                        fontSize: "var(--text-lg)",
-                        fontWeight: 600,
-                        color: "var(--color-text-dark)",
-                        margin: 0,
-                      }}
-                    >
-                      Masters in Software Engineering
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--color-text-light)",
-                      }}
-                    >
-                      Jan 2019 – Dec 2020
-                    </span>
-                  </div>
-                  <p
-                    style={{
-                      color: "var(--color-text-medium)",
-                      fontStyle: "italic",
-                      margin: 0,
-                    }}
-                  >
-                    XYX University, Bangalore
-                  </p>
-                </div>
+                </h2>
 
-                {/* Education Item 2 */}
                 <div
                   style={{
                     position: "relative",
-                    paddingLeft: "var(--space-xl)",
-                    marginBottom: "var(--space-xl)",
                   }}
                 >
+                  {/* Timeline vertical line */}
                   <div
                     style={{
                       position: "absolute",
-                      top: "5px",
-                      left: 0,
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "50%",
-                      backgroundColor: "var(--color-white)",
-                      border: "3px solid var(--color-secondary)",
-                      zIndex: 1,
+                      top: "10px",
+                      bottom: "10px",
+                      left: "8px",
+                      width: "2px",
+                      backgroundColor: "#e0e0e0",
                     }}
                   ></div>
-                  <div
+
+                  {data.education.map((edu, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        position: "relative",
+                        paddingLeft: "var(--space-xl)",
+                        marginBottom: "var(--space-xl)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "5px",
+                          left: 0,
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "50%",
+                          backgroundColor: "var(--color-white)",
+                          border: "3px solid var(--color-secondary)",
+                          zIndex: 1,
+                        }}
+                      ></div>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          marginBottom: "var(--space-sm)",
+                        }}
+                      >
+                        <h3
+                          style={{
+                            fontSize: "var(--text-lg)",
+                            fontWeight: 600,
+                            color: "var(--color-text-dark)",
+                            margin: 0,
+                          }}
+                        >
+                          {edu.degree}
+                        </h3>
+                        <span
+                          style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--color-text-light)",
+                          }}
+                        >
+                          {formatDate(edu.startDate)} –{" "}
+                          {formatDate(edu.graduationDate)}
+                        </span>
+                      </div>
+                      <p
+                        style={{
+                          color: "var(--color-text-medium)",
+                          fontStyle: "italic",
+                          margin: 0,
+                        }}
+                      >
+                        {edu.school}, {edu.city}
+                      </p>
+                      {edu.description && (
+                        <p
+                          style={{
+                            color: "var(--color-text-medium)",
+                            marginTop: "var(--space-sm)",
+                          }}
+                        >
+                          {edu.description}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+
+            {/* Projects - Only show if using local data and projects exist */}
+            {hasLocalData &&
+              renderSection(data.projects, () => (
+                <section>
+                  <h2
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "var(--space-sm)",
+                      fontSize: "var(--text-2xl)",
+                      textTransform: "uppercase",
+                      letterSpacing: "2px",
+                      marginBottom: "var(--space-lg)",
+                      position: "relative",
+                      paddingBottom: "var(--space-sm)",
+                      color: "var(--color-primary)",
+                      margin: "0 0 var(--space-lg) 0",
                     }}
                   >
-                    <h3
+                    Projects
+                    <div
                       style={{
-                        fontSize: "var(--text-lg)",
-                        fontWeight: 600,
-                        color: "var(--color-text-dark)",
-                        margin: 0,
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: "50px",
+                        height: "3px",
+                        backgroundColor: "var(--color-secondary)",
+                      }}
+                    ></div>
+                  </h2>
+
+                  {data.projects.map((project, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        marginBottom: "var(--space-xl)",
                       }}
                     >
-                      Bachelor in Computer Science
-                    </h3>
-                    <span
-                      style={{
-                        fontSize: "var(--text-sm)",
-                        color: "var(--color-text-light)",
-                      }}
-                    >
-                      Jan 2015 – Dec 2018
-                    </span>
-                  </div>
-                  <p
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          marginBottom: "var(--space-sm)",
+                        }}
+                      >
+                        <h3
+                          style={{
+                            fontSize: "var(--text-lg)",
+                            fontWeight: 600,
+                            color: "var(--color-text-dark)",
+                            margin: 0,
+                          }}
+                        >
+                          {project.title}
+                        </h3>
+                        {project.link && (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              fontSize: "var(--text-sm)",
+                              color: "var(--color-primary)",
+                            }}
+                          >
+                            View Project
+                          </a>
+                        )}
+                      </div>
+                      <p
+                        style={{
+                          color: "var(--color-text-medium)",
+                          lineHeight: 1.8,
+                          margin: "0 0 var(--space-sm) 0",
+                          whiteSpace: "pre-line",
+                        }}
+                      >
+                        {project.description}
+                      </p>
+                      {project.technologies && (
+                        <p
+                          style={{
+                            color: "var(--color-text-light)",
+                            fontSize: "var(--text-sm)",
+                            fontStyle: "italic",
+                            margin: 0,
+                          }}
+                        >
+                          <strong>Technologies:</strong> {project.technologies}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </section>
+              ))}
+
+            {/* Certifications - Only show if using local data and certifications exist */}
+            {hasLocalData &&
+              renderSection(data.certifications, () => (
+                <section>
+                  <h2
                     style={{
-                      color: "var(--color-text-medium)",
-                      fontStyle: "italic",
+                      fontSize: "var(--text-2xl)",
+                      textTransform: "uppercase",
+                      letterSpacing: "2px",
+                      marginBottom: "var(--space-lg)",
+                      position: "relative",
+                      paddingBottom: "var(--space-sm)",
+                      color: "var(--color-primary)",
+                      margin: "0 0 var(--space-lg) 0",
+                    }}
+                  >
+                    Certifications
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        width: "50px",
+                        height: "3px",
+                        backgroundColor: "var(--color-secondary)",
+                      }}
+                    ></div>
+                  </h2>
+
+                  <ul
+                    style={{
+                      listStyle: "none",
+                      padding: 0,
                       margin: 0,
                     }}
                   >
-                    XYX University, Bangalore
-                  </p>
-                </div>
-              </div>
-            </section>
+                    {data.certifications.map((cert, index) => (
+                      <li
+                        key={index}
+                        style={{
+                          marginBottom: "var(--space-lg)",
+                        }}
+                      >
+                        <h3
+                          style={{
+                            fontSize: "var(--text-lg)",
+                            fontWeight: 600,
+                            color: "var(--color-text-dark)",
+                            margin: "0 0 var(--space-xs) 0",
+                          }}
+                        >
+                          {cert.name}
+                        </h3>
+                        <p
+                          style={{
+                            color: "var(--color-text-medium)",
+                            fontStyle: "italic",
+                            margin: "0 0 var(--space-xs) 0",
+                          }}
+                        >
+                          {cert.organization}
+                        </p>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "var(--space-md)",
+                            fontSize: "var(--text-sm)",
+                            color: "var(--color-text-light)",
+                          }}
+                        >
+                          <span>Issued: {formatDate(cert.date)}</span>
+                          {cert.expiry && (
+                            <span>Expires: {formatDate(cert.expiry)}</span>
+                          )}
+                        </div>
+                        {cert.credential && (
+                          <p
+                            style={{
+                              fontSize: "var(--text-sm)",
+                              color: "var(--color-primary)",
+                              margin: "var(--space-xs) 0 0 0",
+                            }}
+                          >
+                            Credential: {cert.credential}
+                          </p>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
           </div>
         </div>
       </div>

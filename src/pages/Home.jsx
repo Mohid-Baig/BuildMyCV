@@ -26,7 +26,10 @@ const Home = () => {
           className="cta-button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => navigate("./form")}
+          onClick={() => {
+            navigate("./form");
+            //  localStorage.removeItem("resumeData");
+          }}
         >
           Create My CV Now
         </motion.button>

@@ -150,7 +150,7 @@ const About = () => {
       <div className="project-info">
         <h2>About The Project</h2>
         <p>
-          BuildMyCV is a final semester project developed as part of our Web
+          BuildMyCV is a semester final project developed as part of our Web
           Engineering course in the Computer Science curriculum at NCBA&E. The
           platform helps users create professional resumes quickly and easily
           with customizable templates. Our goal is to simplify the job
