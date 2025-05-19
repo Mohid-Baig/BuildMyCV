@@ -11,13 +11,18 @@ const ResumeForm = () => {
       address: "",
       email: "",
       phone: "",
-      website: "",
-      linkedin: "",
-      github: "",
       summary: "",
       image: null,
       imagePreview: "",
     },
+    socialLinks: {
+      website: "",
+      linkedin: "",
+      github: "",
+      twitter: "",
+      portfolio: "",
+    },
+    languages: [],
     achievements: [],
     experiences: [],
     education: [],
@@ -51,6 +56,28 @@ const ResumeForm = () => {
     }
   };
 
+  const handlePersonalInfoChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      personalInfo: {
+        ...formData.personalInfo,
+        [name]: value,
+      },
+    });
+  };
+
+  const handleSocialLinksChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      socialLinks: {
+        ...formData.socialLinks,
+        [name]: value,
+      },
+    });
+  };
+
   const handleChange = (e, section, index = null) => {
     const { name, value } = e.target;
 
@@ -58,15 +85,13 @@ const ResumeForm = () => {
       const updatedSection = [...formData[section]];
       updatedSection[index][name] = value;
       setFormData({ ...formData, [section]: updatedSection });
-    } else {
-      setFormData({
-        ...formData,
-        personalInfo: {
-          ...formData.personalInfo,
-          [name]: value,
-        },
-      });
     }
+  };
+
+  const handleSkillChange = (e, index, field) => {
+    const updatedSkills = [...formData.skills];
+    updatedSkills[index][field] = e.target.value;
+    setFormData({ ...formData, skills: updatedSkills });
   };
 
   const addEntry = (section, template) => {
@@ -113,13 +138,18 @@ const ResumeForm = () => {
           address: "",
           email: "",
           phone: "",
-          website: "",
-          linkedin: "",
-          github: "",
           summary: "",
           image: null,
           imagePreview: "",
         },
+        socialLinks: {
+          website: "",
+          linkedin: "",
+          github: "",
+          twitter: "",
+          portfolio: "",
+        },
+        languages: [],
         achievements: [],
         experiences: [],
         education: [],
@@ -133,7 +163,7 @@ const ResumeForm = () => {
 
   return (
     <div className="resume-form-container">
-      <h2 className="form-title">Build Your Resume</h2>
+      <h2 className="form-title">Build Your Professional Resume</h2>
       <form onSubmit={handleSubmit}>
         {/* Personal Information Section */}
         <div className="form-section">
@@ -145,7 +175,7 @@ const ResumeForm = () => {
                 type="text"
                 name="firstName"
                 value={formData.personalInfo.firstName}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                onChange={handlePersonalInfoChange}
                 className="form-control"
                 placeholder="John"
                 required
@@ -158,7 +188,7 @@ const ResumeForm = () => {
                 type="text"
                 name="middleName"
                 value={formData.personalInfo.middleName}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                onChange={handlePersonalInfoChange}
                 className="form-control"
                 placeholder="Herbert"
               />
@@ -170,7 +200,7 @@ const ResumeForm = () => {
                 type="text"
                 name="lastName"
                 value={formData.personalInfo.lastName}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                onChange={handlePersonalInfoChange}
                 className="form-control"
                 placeholder="Doe"
                 required
@@ -180,12 +210,12 @@ const ResumeForm = () => {
 
           <div className="form-grid cols-3">
             <div className="form-group">
-              <label className="form-label">Your Image*</label>
+              <label className="form-label">Your Photo*</label>
               <input
                 type="file"
                 name="image"
                 onChange={handleImageUpload}
-                className="form-control"
+                className="form-control custom-file-input"
                 accept="image/*"
                 required
               />
@@ -197,12 +227,12 @@ const ResumeForm = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Designation*</label>
+              <label className="form-label">Job Title*</label>
               <input
                 type="text"
                 name="designation"
                 value={formData.personalInfo.designation}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                onChange={handlePersonalInfoChange}
                 className="form-control"
                 placeholder="Sr. Software Engineer"
                 required
@@ -215,9 +245,9 @@ const ResumeForm = () => {
                 type="text"
                 name="address"
                 value={formData.personalInfo.address}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                onChange={handlePersonalInfoChange}
                 className="form-control"
-                placeholder="Lake Street-23"
+                placeholder="City, Country"
                 required
               />
             </div>
@@ -230,7 +260,7 @@ const ResumeForm = () => {
                 type="email"
                 name="email"
                 value={formData.personalInfo.email}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                onChange={handlePersonalInfoChange}
                 className="form-control"
                 placeholder="johndoe@gmail.com"
                 required
@@ -243,34 +273,51 @@ const ResumeForm = () => {
                 type="tel"
                 name="phone"
                 value={formData.personalInfo.phone}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                onChange={handlePersonalInfoChange}
                 className="form-control"
-                placeholder="456-768-798"
+                placeholder="+92 300 12345678"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Website</label>
+              <label className="form-label">Professional Summary*</label>
+              <textarea
+                name="summary"
+                value={formData.personalInfo.summary}
+                onChange={handlePersonalInfoChange}
+                className="form-control"
+                placeholder="Brief overview of your professional background and strengths..."
+                rows="3"
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Social Links Section */}
+        <div className="form-section">
+          <h3 className="section-title">Social & Online Presence</h3>
+          <div className="form-grid cols-3">
+            <div className="form-group">
+              <label className="form-label">Personal Website</label>
               <input
                 type="url"
                 name="website"
-                value={formData.personalInfo.website}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                value={formData.socialLinks.website}
+                onChange={handleSocialLinksChange}
                 className="form-control"
                 placeholder="https://yourwebsite.com"
               />
             </div>
-          </div>
 
-          <div className="form-grid cols-3">
             <div className="form-group">
               <label className="form-label">LinkedIn</label>
               <input
                 type="url"
                 name="linkedin"
-                value={formData.personalInfo.linkedin}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                value={formData.socialLinks.linkedin}
+                onChange={handleSocialLinksChange}
                 className="form-control"
                 placeholder="https://linkedin.com/in/yourprofile"
               />
@@ -281,26 +328,100 @@ const ResumeForm = () => {
               <input
                 type="url"
                 name="github"
-                value={formData.personalInfo.github}
-                onChange={(e) => handleChange(e, "personalInfo")}
+                value={formData.socialLinks.github}
+                onChange={handleSocialLinksChange}
                 className="form-control"
                 placeholder="https://github.com/yourusername"
               />
             </div>
+          </div>
+
+          <div className="form-grid cols-2">
+            <div className="form-group">
+              <label className="form-label">Twitter/X</label>
+              <input
+                type="url"
+                name="twitter"
+                value={formData.socialLinks.twitter}
+                onChange={handleSocialLinksChange}
+                className="form-control"
+                placeholder="https://twitter.com/yourusername"
+              />
+            </div>
 
             <div className="form-group">
-              <label className="form-label">Summary*</label>
-              <textarea
-                name="summary"
-                value={formData.personalInfo.summary}
-                onChange={(e) => handleChange(e, "personalInfo")}
+              <label className="form-label">Portfolio</label>
+              <input
+                type="url"
+                name="portfolio"
+                value={formData.socialLinks.portfolio}
+                onChange={handleSocialLinksChange}
                 className="form-control"
-                placeholder="Professional summary..."
-                rows="3"
-                required
+                placeholder="https://yourportfolio.com"
               />
             </div>
           </div>
+        </div>
+
+        {/* Languages Section */}
+        <div className="form-section">
+          <div className="section-header">
+            <h3 className="section-title">Languages</h3>
+            <button
+              type="button"
+              className="add-btn"
+              onClick={() =>
+                addEntry("languages", { name: "", proficiency: "Intermediate" })
+              }
+            >
+              + Add Language
+            </button>
+          </div>
+
+          {formData.languages.map((language, index) => (
+            <div key={index} className="form-row">
+              <div className="form-grid cols-2">
+                <div className="form-group">
+                  <label className="form-label">Language*</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={language.name}
+                    onChange={(e) => handleChange(e, "languages", index)}
+                    className="form-control"
+                    placeholder="e.g., English, Spanish, French"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Proficiency Level*</label>
+                  <select
+                    name="proficiency"
+                    value={language.proficiency}
+                    onChange={(e) => handleChange(e, "languages", index)}
+                    className="form-control"
+                    required
+                  >
+                    <option value="Native">Native</option>
+                    <option value="Fluent">Fluent</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Basic">Basic</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="remove-btn"
+                onClick={() => removeEntry("languages", index)}
+                aria-label="Remove language"
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
 
         {/* Achievements Section */}
@@ -322,7 +443,7 @@ const ResumeForm = () => {
             <div key={index} className="form-row">
               <div className="form-grid cols-2">
                 <div className="form-group">
-                  <label className="form-label">Title</label>
+                  <label className="form-label">Title*</label>
                   <input
                     type="text"
                     name="title"
@@ -330,18 +451,20 @@ const ResumeForm = () => {
                     onChange={(e) => handleChange(e, "achievements", index)}
                     className="form-control"
                     placeholder="Achievement title"
+                    required
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Description</label>
-                  <input
-                    type="text"
+                  <label className="form-label">Description*</label>
+                  <textarea
                     name="description"
                     value={achievement.description}
                     onChange={(e) => handleChange(e, "achievements", index)}
                     className="form-control"
                     placeholder="Achievement description"
+                    rows="2"
+                    required
                   />
                 </div>
               </div>
@@ -350,8 +473,9 @@ const ResumeForm = () => {
                 type="button"
                 className="remove-btn"
                 onClick={() => removeEntry("achievements", index)}
+                aria-label="Remove achievement"
               >
-                Remove
+                ×
               </button>
             </div>
           ))}
@@ -371,6 +495,7 @@ const ResumeForm = () => {
                   location: "",
                   startDate: "",
                   endDate: "",
+                  current: false,
                   description: "",
                 })
               }
@@ -383,7 +508,7 @@ const ResumeForm = () => {
             <div key={index} className="form-row">
               <div className="form-grid cols-3">
                 <div className="form-group">
-                  <label className="form-label">Title*</label>
+                  <label className="form-label">Job Title*</label>
                   <input
                     type="text"
                     name="title"
@@ -442,8 +567,33 @@ const ResumeForm = () => {
                     value={exp.endDate}
                     onChange={(e) => handleChange(e, "experiences", index)}
                     className="form-control"
-                    placeholder="Present if current"
+                    disabled={exp.current}
                   />
+                  <div className="checkbox-container">
+                    <input
+                      type="checkbox"
+                      id={`current-job-${index}`}
+                      name="current"
+                      checked={exp.current}
+                      onChange={(e) => {
+                        const updatedExperiences = [...formData.experiences];
+                        updatedExperiences[index].current = e.target.checked;
+                        if (e.target.checked) {
+                          updatedExperiences[index].endDate = "";
+                        }
+                        setFormData({
+                          ...formData,
+                          experiences: updatedExperiences,
+                        });
+                      }}
+                    />
+                    <label
+                      htmlFor={`current-job-${index}`}
+                      className="checkbox-label"
+                    >
+                      Current Position
+                    </label>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -464,8 +614,9 @@ const ResumeForm = () => {
                 type="button"
                 className="remove-btn"
                 onClick={() => removeEntry("experiences", index)}
+                aria-label="Remove experience"
               >
-                Remove
+                ×
               </button>
             </div>
           ))}
@@ -482,6 +633,7 @@ const ResumeForm = () => {
                 addEntry("education", {
                   school: "",
                   degree: "",
+                  field: "",
                   city: "",
                   startDate: "",
                   graduationDate: "",
@@ -497,7 +649,7 @@ const ResumeForm = () => {
             <div key={index} className="form-row">
               <div className="form-grid cols-3">
                 <div className="form-group">
-                  <label className="form-label">School*</label>
+                  <label className="form-label">School/University*</label>
                   <input
                     type="text"
                     name="school"
@@ -523,7 +675,22 @@ const ResumeForm = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">City</label>
+                  <label className="form-label">Field of Study*</label>
+                  <input
+                    type="text"
+                    name="field"
+                    value={edu.field}
+                    onChange={(e) => handleChange(e, "education", index)}
+                    className="form-control"
+                    placeholder="Computer Science"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-grid cols-3">
+                <div className="form-group">
+                  <label className="form-label">Location</label>
                   <input
                     type="text"
                     name="city"
@@ -533,9 +700,7 @@ const ResumeForm = () => {
                     placeholder="City, Country"
                   />
                 </div>
-              </div>
 
-              <div className="form-grid cols-3">
                 <div className="form-group">
                   <label className="form-label">Start Date*</label>
                   <input
@@ -559,26 +724,27 @@ const ResumeForm = () => {
                     required
                   />
                 </div>
+              </div>
 
-                <div className="form-group">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    name="description"
-                    value={edu.description}
-                    onChange={(e) => handleChange(e, "education", index)}
-                    className="form-control"
-                    placeholder="Notable achievements or coursework"
-                    rows="3"
-                  />
-                </div>
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea
+                  name="description"
+                  value={edu.description}
+                  onChange={(e) => handleChange(e, "education", index)}
+                  className="form-control"
+                  placeholder="Notable achievements or coursework"
+                  rows="2"
+                />
               </div>
 
               <button
                 type="button"
                 className="remove-btn"
                 onClick={() => removeEntry("education", index)}
+                aria-label="Remove education"
               >
-                Remove
+                ×
               </button>
             </div>
           ))}
@@ -596,6 +762,7 @@ const ResumeForm = () => {
                   title: "",
                   link: "",
                   description: "",
+                  technologies: "",
                 })
               }
             >
@@ -605,7 +772,7 @@ const ResumeForm = () => {
 
           {formData.projects.map((project, index) => (
             <div key={index} className="form-row">
-              <div className="form-grid cols-3">
+              <div className="form-grid cols-2">
                 <div className="form-group">
                   <label className="form-label">Project Name*</label>
                   <input
@@ -630,7 +797,9 @@ const ResumeForm = () => {
                     placeholder="https://example.com"
                   />
                 </div>
+              </div>
 
+              <div className="form-grid cols-2">
                 <div className="form-group">
                   <label className="form-label">Description*</label>
                   <textarea
@@ -643,14 +812,103 @@ const ResumeForm = () => {
                     required
                   />
                 </div>
+
+                <div className="form-group">
+                  <label className="form-label">Technologies Used</label>
+                  <textarea
+                    name="technologies"
+                    value={project.technologies}
+                    onChange={(e) => handleChange(e, "projects", index)}
+                    className="form-control"
+                    placeholder="React, Node.js, MongoDB, etc."
+                    rows="3"
+                  />
+                </div>
               </div>
 
               <button
                 type="button"
                 className="remove-btn"
                 onClick={() => removeEntry("projects", index)}
+                aria-label="Remove project"
               >
-                Remove
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Skills Section */}
+        <div className="form-section">
+          <div className="section-header">
+            <h3 className="section-title">Skills</h3>
+            <button
+              type="button"
+              className="add-btn"
+              onClick={() =>
+                addEntry("skills", { name: "", proficiency: "50" })
+              }
+            >
+              + Add Skill
+            </button>
+          </div>
+
+          {formData.skills.map((skill, index) => (
+            <div key={index} className="form-row skill-row">
+              <div className="form-grid cols-2">
+                <div className="form-group">
+                  <label className="form-label">Skill Name*</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={skill.name}
+                    onChange={(e) => handleSkillChange(e, index, "name")}
+                    className="form-control"
+                    placeholder="e.g., JavaScript, Project Management"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">
+                    Proficiency* ({skill.proficiency}%)
+                  </label>
+                  <div className="range-container">
+                    <input
+                      type="range"
+                      min="10"
+                      max="100"
+                      step="5"
+                      value={skill.proficiency}
+                      onChange={(e) =>
+                        handleSkillChange(e, index, "proficiency")
+                      }
+                      className="range-input"
+                      required
+                    />
+                    <div className="proficiency-level">
+                      {skill.proficiency < 25 && "Beginner"}
+                      {skill.proficiency >= 25 &&
+                        skill.proficiency < 50 &&
+                        "Elementary"}
+                      {skill.proficiency >= 50 &&
+                        skill.proficiency < 75 &&
+                        "Intermediate"}
+                      {skill.proficiency >= 75 &&
+                        skill.proficiency < 90 &&
+                        "Advanced"}
+                      {skill.proficiency >= 90 && "Expert"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="remove-btn"
+                onClick={() => removeEntry("skills", index)}
+                aria-label="Remove skill"
+              >
+                ×
               </button>
             </div>
           ))}
@@ -669,6 +927,7 @@ const ResumeForm = () => {
                   organization: "",
                   date: "",
                   credential: "",
+                  expiry: "",
                 })
               }
             >
@@ -678,9 +937,9 @@ const ResumeForm = () => {
 
           {formData.certifications.map((cert, index) => (
             <div key={index} className="form-row">
-              <div className="form-grid cols-4">
+              <div className="form-grid cols-2">
                 <div className="form-group">
-                  <label className="form-label">Name*</label>
+                  <label className="form-label">Certification Name*</label>
                   <input
                     type="text"
                     name="name"
@@ -693,7 +952,7 @@ const ResumeForm = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Organization*</label>
+                  <label className="form-label">Issuing Organization*</label>
                   <input
                     type="text"
                     name="organization"
@@ -704,9 +963,11 @@ const ResumeForm = () => {
                     required
                   />
                 </div>
+              </div>
 
+              <div className="form-grid cols-3">
                 <div className="form-group">
-                  <label className="form-label">Date*</label>
+                  <label className="form-label">Issue Date*</label>
                   <input
                     type="date"
                     name="date"
@@ -718,14 +979,27 @@ const ResumeForm = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Credential ID</label>
+                  <label className="form-label">
+                    Expiry Date (if applicable)
+                  </label>
+                  <input
+                    type="date"
+                    name="expiry"
+                    value={cert.expiry}
+                    onChange={(e) => handleChange(e, "certifications", index)}
+                    className="form-control"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Credential ID/URL</label>
                   <input
                     type="text"
                     name="credential"
                     value={cert.credential}
                     onChange={(e) => handleChange(e, "certifications", index)}
                     className="form-control"
-                    placeholder="Credential ID or URL"
+                    placeholder="Credential ID or verification URL"
                   />
                 </div>
               </div>
@@ -734,48 +1008,12 @@ const ResumeForm = () => {
                 type="button"
                 className="remove-btn"
                 onClick={() => removeEntry("certifications", index)}
+                aria-label="Remove certification"
               >
-                Remove
+                ×
               </button>
             </div>
           ))}
-        </div>
-
-        {/* Skills Section */}
-        <div className="form-section">
-          <div className="section-header">
-            <h3 className="section-title">Skills</h3>
-            <button
-              type="button"
-              className="add-btn"
-              onClick={() => addEntry("skills", { name: "" })}
-            >
-              + Add Skill
-            </button>
-          </div>
-
-          <div className="skills-container">
-            {formData.skills.map((skill, index) => (
-              <div key={index} className="skill-item">
-                <input
-                  type="text"
-                  name="name"
-                  value={skill.name}
-                  onChange={(e) => handleChange(e, "skills", index)}
-                  className="form-control skill-input"
-                  placeholder="Skill name"
-                  required
-                />
-                <button
-                  type="button"
-                  className="remove-skill-btn"
-                  onClick={() => removeEntry("skills", index)}
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="form-actions">
