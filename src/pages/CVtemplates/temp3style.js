@@ -241,5 +241,34 @@ const styles = {
         color: "#555",
         fontStyle: "italic",
     },
+    pageContainer: {
+        display: "flex",
+        flexDirection: "column",
+        maxWidth: "900px",
+        margin: "0 auto",
+        padding: "20px",
+    },
+    buttonContainer: {
+        display: "flex",
+        justifyContent: "center",
+        gap: "20px",
+        marginBottom: "20px",
+    },
+    button: {
+        padding: "10px 20px",
+        fontSize: "16px",
+        fontWeight: "bold",
+        backgroundColor: "#4a6cf7",
+        color: "white",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        transition: "background-color 0.3s ease",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    },
+
 };
 export default styles;

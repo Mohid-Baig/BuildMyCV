@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./temp4style";
+import { useNavigate } from "react-router-dom";
 
 const Resume4 = () => {
   const [resumeData, setResumeData] = useState(null);
   const [hasLocalData, setHasLocalData] = useState(false);
-
+  const [isDownloading, setIsDownloading] = useState(false);
+  const resumeRef = useRef(null);
+  const navigate = useNavigate();
   // Check for saved data in localStorage
   useEffect(() => {
     const savedData = localStorage.getItem("resumeData");
@@ -18,6 +21,58 @@ const Resume4 = () => {
     if (!dateString) return "";
     const options = { year: "numeric", month: "short" };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const downloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+
+      // Check if window is defined (we're in the browser)
+      if (typeof window === "undefined") {
+        throw new Error("PDF generation can only happen in the browser");
+      }
+
+      // First, check if the script is already loaded
+      let html2pdfScript = document.getElementById("html2pdf-script");
+
+      if (!html2pdfScript) {
+        // If script is not loaded, add it to the document
+        html2pdfScript = document.createElement("script");
+        html2pdfScript.id = "html2pdf-script";
+        html2pdfScript.src =
+          "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+        document.body.appendChild(html2pdfScript);
+
+        // Wait for the script to load
+        await new Promise((resolve, reject) => {
+          html2pdfScript.onload = resolve;
+          html2pdfScript.onerror = reject;
+        });
+      }
+
+      // At this point, html2pdf should be available globally
+      const element = resumeRef.current;
+      const opt = {
+        margin: 10,
+        filename: `${data.personalInfo.firstName}_${data.personalInfo.lastName}_Resume.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      };
+
+      // Use the global html2pdf object
+      await window.html2pdf().from(element).set(opt).save();
+      setIsDownloading(false);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      setIsDownloading(false);
+      alert("Failed to download PDF. Please try again.");
+    }
+  };
+
+  // Handle Edit button click
+  const handleEdit = () => {
+    navigate("/form");
   };
 
   // Static fallback data
@@ -169,234 +224,255 @@ const Resume4 = () => {
   };
 
   return (
-    <div style={styles.container}>
-      {/* Sidebar Section */}
-      <div style={styles.sidebar}>
-        <div style={styles.profileSection}>
-          <div style={styles.profileImage}>
-            <img
-              src={data.personalInfo.imagePreview || "/api/placeholder/180/180"}
-              alt="Profile"
-              style={styles.profileImg}
-            />
+    <div>
+      {/* Action Buttons */}
+      <div style={styles.buttonContainer}>
+        <button
+          style={styles.button}
+          onClick={downloadPDF}
+          disabled={isDownloading}
+        >
+          {isDownloading ? "Generating PDF..." : "📥 Download PDF"}
+        </button>
+        <button style={styles.button} onClick={handleEdit}>
+          ✏️ Edit Resume
+        </button>
+      </div>
+      <div style={styles.container} ref={resumeRef}>
+        {/* Sidebar Section */}
+        <div style={styles.sidebar}>
+          <div style={styles.profileSection}>
+            <div style={styles.profileImage}>
+              <img
+                src={
+                  data.personalInfo.imagePreview || "/api/placeholder/180/180"
+                }
+                alt="Profile"
+                style={styles.profileImg}
+              />
+            </div>
+            <h1 style={styles.profileName}>
+              {data.personalInfo.firstName} {data.personalInfo.lastName}
+            </h1>
+            <p style={styles.profileTitle}>{data.personalInfo.designation}</p>
           </div>
-          <h1 style={styles.profileName}>
-            {data.personalInfo.firstName} {data.personalInfo.lastName}
-          </h1>
-          <p style={styles.profileTitle}>{data.personalInfo.designation}</p>
-        </div>
 
-        {/* Contact */}
-        {renderSection(data.personalInfo, () => (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>
-              Contact
-              <span style={styles.sectionTitleAfter}></span>
-            </h2>
-            <ul style={styles.contactList}>
-              <li style={styles.contactItem}>
-                <div style={styles.contactIcon}>
-                  <i className="fas fa-phone"></i>
-                </div>
-                <div style={styles.contactText}>{data.personalInfo.phone}</div>
-              </li>
-              <li style={styles.contactItem}>
-                <div style={styles.contactIcon}>
-                  <i className="fas fa-envelope"></i>
-                </div>
-                <div style={styles.contactText}>{data.personalInfo.email}</div>
-              </li>
-              {data.personalInfo.website && (
+          {/* Contact */}
+          {renderSection(data.personalInfo, () => (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>
+                Contact
+                <span style={styles.sectionTitleAfter}></span>
+              </h2>
+              <ul style={styles.contactList}>
                 <li style={styles.contactItem}>
                   <div style={styles.contactIcon}>
-                    <i className="fas fa-globe"></i>
+                    <i className="fas fa-phone"></i>
                   </div>
                   <div style={styles.contactText}>
-                    {data.personalInfo.website}
+                    {data.personalInfo.phone}
                   </div>
                 </li>
-              )}
-              <li style={styles.contactItem}>
-                <div style={styles.contactIcon}>
-                  <i className="fas fa-map-marker-alt"></i>
-                </div>
-                <div style={styles.contactText}>
-                  {data.personalInfo.address}
-                </div>
-              </li>
-            </ul>
-          </div>
-        ))}
+                <li style={styles.contactItem}>
+                  <div style={styles.contactIcon}>
+                    <i className="fas fa-envelope"></i>
+                  </div>
+                  <div style={styles.contactText}>
+                    {data.personalInfo.email}
+                  </div>
+                </li>
+                {data.personalInfo.website && (
+                  <li style={styles.contactItem}>
+                    <div style={styles.contactIcon}>
+                      <i className="fas fa-globe"></i>
+                    </div>
+                    <div style={styles.contactText}>
+                      {data.personalInfo.website}
+                    </div>
+                  </li>
+                )}
+                <li style={styles.contactItem}>
+                  <div style={styles.contactIcon}>
+                    <i className="fas fa-map-marker-alt"></i>
+                  </div>
+                  <div style={styles.contactText}>
+                    {data.personalInfo.address}
+                  </div>
+                </li>
+              </ul>
+            </div>
+          ))}
 
-        {/* Skills */}
-        {renderSection(data.skills, () => (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>
-              Skills
-              <span style={styles.sectionTitleAfter}></span>
-            </h2>
-            <ul style={styles.skillsList}>
-              {data.skills.map((skill, index) => (
-                <Skill
+          {/* Skills */}
+          {renderSection(data.skills, () => (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>
+                Skills
+                <span style={styles.sectionTitleAfter}></span>
+              </h2>
+              <ul style={styles.skillsList}>
+                {data.skills.map((skill, index) => (
+                  <Skill
+                    key={index}
+                    name={skill.name}
+                    percentage={skill.proficiency}
+                    styles={styles}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          {/* Education */}
+          {renderSection(data.education, () => (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>
+                Education
+                <span style={styles.sectionTitleAfter}></span>
+              </h2>
+              {data.education.map((edu, index) => (
+                <Education
                   key={index}
-                  name={skill.name}
-                  percentage={skill.proficiency}
-                  styles={styles}
-                />
-              ))}
-            </ul>
-          </div>
-        ))}
-
-        {/* Education */}
-        {renderSection(data.education, () => (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>
-              Education
-              <span style={styles.sectionTitleAfter}></span>
-            </h2>
-            {data.education.map((edu, index) => (
-              <Education
-                key={index}
-                date={`${formatDate(edu.startDate)} – ${formatDate(
-                  edu.graduationDate
-                )}`}
-                degree={edu.degree}
-                institution={edu.school}
-                styles={styles}
-              />
-            ))}
-          </div>
-        ))}
-
-        {/* Languages */}
-        {renderSection(data.languages, () => (
-          <div style={styles.section}>
-            <h2 style={styles.sectionTitle}>
-              Languages
-              <span style={styles.sectionTitleAfter}></span>
-            </h2>
-            <ul style={styles.languagesList}>
-              {data.languages.map((lang, index) => (
-                <Language
-                  key={index}
-                  name={lang.name}
-                  level={lang.proficiency}
-                  styles={styles}
-                />
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Content */}
-      <div style={styles.mainContent}>
-        {/* About Me */}
-        {renderSection(data.personalInfo.summary, () => (
-          <div style={styles.mainSection}>
-            <h2 style={styles.mainTitle}>
-              About Me
-              <span style={styles.mainTitleAfter}></span>
-            </h2>
-            <p style={styles.aboutText}>{data.personalInfo.summary}</p>
-          </div>
-        ))}
-
-        {/* Professional Experience */}
-        {renderSection(data.experiences, () => (
-          <div style={styles.mainSection}>
-            <h2 style={styles.mainTitle}>
-              Professional Experience
-              <span style={styles.mainTitleAfter}></span>
-            </h2>
-            {data.experiences.map((exp, index) => (
-              <Experience
-                key={index}
-                position={exp.title}
-                company={exp.organization}
-                date={`${formatDate(exp.startDate)} – ${
-                  exp.current ? "Present" : formatDate(exp.endDate)
-                }`}
-                description={exp.description}
-                styles={styles}
-              />
-            ))}
-          </div>
-        ))}
-
-        {/* Projects */}
-        {renderSection(data.projects, () => (
-          <div style={styles.mainSection}>
-            <h2 style={styles.mainTitle}>
-              Projects
-              <span style={styles.mainTitleAfter}></span>
-            </h2>
-            <div style={styles.projectsContainer}>
-              {data.projects.map((project, index) => (
-                <Project
-                  key={index}
-                  title={project.title}
-                  subtitle={project.subtitle}
-                  description={project.description}
+                  date={`${formatDate(edu.startDate)} – ${formatDate(
+                    edu.graduationDate
+                  )}`}
+                  degree={edu.degree}
+                  institution={edu.school}
                   styles={styles}
                 />
               ))}
             </div>
-          </div>
-        ))}
+          ))}
 
-        {/* Certifications */}
-        {renderSection(data.certifications, () => (
-          <div style={styles.mainSection}>
-            <h2 style={styles.mainTitle}>
-              Certifications
-              <span style={styles.mainTitleAfter}></span>
-            </h2>
-            <div style={styles.certificationsContainer}>
-              {data.certifications.map((cert, index) => (
-                <Certification
+          {/* Languages */}
+          {renderSection(data.languages, () => (
+            <div style={styles.section}>
+              <h2 style={styles.sectionTitle}>
+                Languages
+                <span style={styles.sectionTitleAfter}></span>
+              </h2>
+              <ul style={styles.languagesList}>
+                {data.languages.map((lang, index) => (
+                  <Language
+                    key={index}
+                    name={lang.name}
+                    level={lang.proficiency}
+                    styles={styles}
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div style={styles.mainContent}>
+          {/* About Me */}
+          {renderSection(data.personalInfo.summary, () => (
+            <div style={styles.mainSection}>
+              <h2 style={styles.mainTitle}>
+                About Me
+                <span style={styles.mainTitleAfter}></span>
+              </h2>
+              <p style={styles.aboutText}>{data.personalInfo.summary}</p>
+            </div>
+          ))}
+
+          {/* Professional Experience */}
+          {renderSection(data.experiences, () => (
+            <div style={styles.mainSection}>
+              <h2 style={styles.mainTitle}>
+                Professional Experience
+                <span style={styles.mainTitleAfter}></span>
+              </h2>
+              {data.experiences.map((exp, index) => (
+                <Experience
                   key={index}
-                  icon={cert.icon}
-                  title={cert.name}
-                  organization={cert.organization}
+                  position={exp.title}
+                  company={exp.organization}
+                  date={`${formatDate(exp.startDate)} – ${
+                    exp.current ? "Present" : formatDate(exp.endDate)
+                  }`}
+                  description={exp.description}
                   styles={styles}
                 />
               ))}
             </div>
-          </div>
-        ))}
+          ))}
 
-        {/* Interests */}
-        {renderSection(data.interests, () => (
-          <div style={styles.mainSection}>
-            <h2 style={styles.mainTitle}>
-              Interests
-              <span style={styles.mainTitleAfter}></span>
-            </h2>
-            <div style={styles.interestsContainer}>
-              {data.interests.map((interest, index) => (
-                <Interest
-                  key={index}
-                  icon={interest.icon}
-                  name={interest.name}
-                  styles={styles}
-                />
-              ))}
+          {/* Projects */}
+          {renderSection(data.projects, () => (
+            <div style={styles.mainSection}>
+              <h2 style={styles.mainTitle}>
+                Projects
+                <span style={styles.mainTitleAfter}></span>
+              </h2>
+              <div style={styles.projectsContainer}>
+                {data.projects.map((project, index) => (
+                  <Project
+                    key={index}
+                    title={project.title}
+                    subtitle={project.subtitle}
+                    description={project.description}
+                    styles={styles}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {/* References */}
-        {renderSection(data.references, () => (
-          <div style={styles.mainSection}>
-            <h2 style={styles.mainTitle}>
-              References
-              <span style={styles.mainTitleAfter}></span>
-            </h2>
-            <div style={styles.referenceBox}>{data.references}</div>
-          </div>
-        ))}
+          {/* Certifications */}
+          {renderSection(data.certifications, () => (
+            <div style={styles.mainSection}>
+              <h2 style={styles.mainTitle}>
+                Certifications
+                <span style={styles.mainTitleAfter}></span>
+              </h2>
+              <div style={styles.certificationsContainer}>
+                {data.certifications.map((cert, index) => (
+                  <Certification
+                    key={index}
+                    icon={cert.icon}
+                    title={cert.name}
+                    organization={cert.organization}
+                    styles={styles}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {/* Interests */}
+          {renderSection(data.interests, () => (
+            <div style={styles.mainSection}>
+              <h2 style={styles.mainTitle}>
+                Interests
+                <span style={styles.mainTitleAfter}></span>
+              </h2>
+              <div style={styles.interestsContainer}>
+                {data.interests.map((interest, index) => (
+                  <Interest
+                    key={index}
+                    icon={interest.icon}
+                    name={interest.name}
+                    styles={styles}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {/* References */}
+          {renderSection(data.references, () => (
+            <div style={styles.mainSection}>
+              <h2 style={styles.mainTitle}>
+                References
+                <span style={styles.mainTitleAfter}></span>
+              </h2>
+              <div style={styles.referenceBox}>{data.references}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

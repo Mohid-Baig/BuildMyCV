@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import for navigation
 import "../Components/Templates.css";
-import template1 from "../assets/images/tp1.jpeg";
-import template2 from "../assets/images/tp2.jpeg";
-import template3 from "../assets/images/tp3.jpeg";
-import template4 from "../assets/images/tp4.jpeg";
+import template1 from "../assets/images/tp1.jpg";
+import template2 from "../assets/images/tp2.jpg";
+import template3 from "../assets/images/tp3.jpg";
+import template4 from "../assets/images/tp4.jpg";
 
 const Templates = () => {
   const [selectedTemplate, setSelectedTemplate] = useState(null);
