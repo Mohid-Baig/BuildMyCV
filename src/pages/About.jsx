@@ -131,8 +131,8 @@ const About = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <p>NCBA&E - Computer Science</p>
-              <p>4th Semester</p>
+              <p>NCBA&E - Computer Science </p>
+              <p> 4th Semester</p>
             </div>
             <div
               className="modal-close"

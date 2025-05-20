@@ -74,9 +74,9 @@ const Login = () => {
               placeholder="••••••••"
               required
             />
-            <Link to="/forgot-password" className="forgot-password">
+            {/* <Link to="/forgot-password" className="forgot-password">
               Forgot password?
-            </Link>
+            </Link> */}
           </div>
 
           <button type="submit" className="auth-button">

@@ -31,7 +31,7 @@ const SignUp = () => {
     const newUser = {
       name,
       email,
-      password, // Note: In a real app, you should NEVER store plain text passwords
+      password,
     };
 
     users.push(newUser);
