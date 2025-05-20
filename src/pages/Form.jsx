@@ -123,7 +123,12 @@ const ResumeForm = () => {
     }
 
     localStorage.setItem("resumeData", JSON.stringify(formData));
-    alert("Resume saved successfully!");
+    // alert("Resume saved successfully!");
+    if (
+      window.confirm("Resume saved successfully! Click OK to view template.")
+    ) {
+      navigate("/templates");
+    }
   };
 
   const handleReset = () => {
@@ -388,7 +393,7 @@ const ResumeForm = () => {
                     value={language.name}
                     onChange={(e) => handleChange(e, "languages", index)}
                     className="form-control"
-                    placeholder="e.g., English, Spanish, French"
+                    placeholder="e.g., English, Urdu, French"
                     required
                   />
                 </div>
