@@ -13,10 +13,8 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    // Get users from local storage
     const users = JSON.parse(localStorage.getItem("users")) || [];
 
-    // Find user by email
     const user = users.find((user) => user.email === email);
 
     if (!user) {
@@ -24,17 +22,15 @@ const Login = () => {
       return;
     }
 
-    // Check password (in real app, compare hashed passwords)
     if (user.password !== password) {
       setError("Incorrect password");
       return;
     }
 
-    // Store current user in local storage (simulate login)
     localStorage.setItem("currentUser", JSON.stringify(user));
 
     // Redirect to dashboard or home
-    navigate("/");
+    navigate("/form");
   };
 
   return (
