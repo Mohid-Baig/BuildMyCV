@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./temp2style";
+import { useNavigate } from "react-router-dom";
 
 const Resume2 = () => {
   const [resumeData, setResumeData] = useState(null);
   const [hasLocalData, setHasLocalData] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const resumeRef = useRef(null);
+  const navigate = useNavigate();
 
   // Check for saved data in localStorage
   useEffect(() => {
@@ -19,6 +23,59 @@ const Resume2 = () => {
       setHasLocalData(false);
     }
   }, []);
+
+  // Download PDF function
+  const downloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+
+      // Check if window is defined (we're in the browser)
+      if (typeof window === "undefined") {
+        throw new Error("PDF generation can only happen in the browser");
+      }
+
+      // First, check if the script is already loaded
+      let html2pdfScript = document.getElementById("html2pdf-script");
+
+      if (!html2pdfScript) {
+        // If script is not loaded, add it to the document
+        html2pdfScript = document.createElement("script");
+        html2pdfScript.id = "html2pdf-script";
+        html2pdfScript.src =
+          "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+        document.body.appendChild(html2pdfScript);
+
+        // Wait for the script to load
+        await new Promise((resolve, reject) => {
+          html2pdfScript.onload = resolve;
+          html2pdfScript.onerror = reject;
+        });
+      }
+
+      // At this point, html2pdf should be available globally
+      const element = resumeRef.current;
+      const opt = {
+        margin: 10,
+        filename: `${data.personalInfo.firstName}_${data.personalInfo.lastName}_Resume.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      };
+
+      // Use the global html2pdf object
+      await window.html2pdf().from(element).set(opt).save();
+      setIsDownloading(false);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      setIsDownloading(false);
+      alert("Failed to download PDF. Please try again.");
+    }
+  };
+
+  // Handle Edit button click
+  const handleEdit = () => {
+    navigate("/form");
+  };
 
   // Static fallback data
   const staticData = {
@@ -176,197 +233,224 @@ const Resume2 = () => {
     : staticData.hobbies;
 
   return (
-    <div style={styles.body}>
-      <div style={styles.resume}>
-        {/* Header Section */}
-        <div style={styles.header}>
-          {personalInfo.imagePreview && (
-            <div style={styles.profileImageContainer}>
-              <img
-                src={personalInfo.imagePreview}
-                alt="Profile"
-                style={styles.profileImage}
-              />
-            </div>
-          )}
-          <div style={styles.headerContent}>
-            <h1 style={styles.headerName}>
-              {`${personalInfo.firstName || ""} ${personalInfo.lastName || ""}`}
-            </h1>
-            {personalInfo.designation && (
-              <p style={styles.headerTitle}>{personalInfo.designation}</p>
+    <div style={styles.pageContainer}>
+      {/* Action Buttons */}
+      <div style={styles.buttonContainer}>
+        <button
+          style={styles.button}
+          onClick={downloadPDF}
+          disabled={isDownloading}
+        >
+          {isDownloading ? "Generating PDF..." : "📥 Download PDF"}
+        </button>
+        <button style={styles.button} onClick={handleEdit}>
+          ✏️ Edit Resume
+        </button>
+      </div>
+
+      {/* Resume Content (to be converted to PDF) */}
+      <div style={styles.body}>
+        <div style={styles.resume} ref={resumeRef}>
+          {/* Header Section */}
+          <div style={styles.header}>
+            {personalInfo.imagePreview && (
+              <div style={styles.profileImageContainer}>
+                <img
+                  src={personalInfo.imagePreview}
+                  alt="Profile"
+                  style={styles.profileImage}
+                />
+              </div>
             )}
-            <div style={styles.contactBar}>
-              {personalInfo.phone && (
-                <div style={styles.contactItem}>
-                  <span style={styles.contactIcon}>📱</span>
-                  <span>{personalInfo.phone}</span>
-                </div>
+            <div style={styles.headerContent}>
+              <h1 style={styles.headerName}>
+                {`${personalInfo.firstName || ""} ${
+                  personalInfo.lastName || ""
+                }`}
+              </h1>
+              {personalInfo.designation && (
+                <p style={styles.headerTitle}>{personalInfo.designation}</p>
               )}
-              {personalInfo.email && (
-                <div style={styles.contactItem}>
-                  <span style={styles.contactIcon}>📧</span>
-                  <span>{personalInfo.email}</span>
-                </div>
-              )}
-              {personalInfo.address && (
-                <div style={styles.contactItem}>
-                  <span style={styles.contactIcon}>📍</span>
-                  <span>{personalInfo.address}</span>
-                </div>
-              )}
+              <div style={styles.contactBar}>
+                {personalInfo.phone && (
+                  <div style={styles.contactItem}>
+                    <span style={styles.contactIcon}>📱</span>
+                    <span>{personalInfo.phone}</span>
+                  </div>
+                )}
+                {personalInfo.email && (
+                  <div style={styles.contactItem}>
+                    <span style={styles.contactIcon}>📧</span>
+                    <span>{personalInfo.email}</span>
+                  </div>
+                )}
+                {personalInfo.address && (
+                  <div style={styles.contactItem}>
+                    <span style={styles.contactIcon}>📍</span>
+                    <span>{personalInfo.address}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div style={styles.mainContent}>
-          {/* Left Column */}
-          <div>
-            {/* About Me */}
-            {renderSection(personalInfo.summary, () => (
-              <div style={styles.contentSection}>
-                <h2 style={styles.sectionTitle}>About Me</h2>
-                <div style={styles.aboutMe}>{personalInfo.summary}</div>
-              </div>
-            ))}
+          {/* Main Content */}
+          <div style={styles.mainContent}>
+            {/* Left Column */}
+            <div>
+              {/* About Me */}
+              {renderSection(personalInfo.summary, () => (
+                <div style={styles.contentSection}>
+                  <h2 style={styles.sectionTitle}>About Me</h2>
+                  <div style={styles.aboutMe}>{personalInfo.summary}</div>
+                </div>
+              ))}
 
-            {/* Work Experience */}
-            {renderSection(experiences, () => (
-              <div style={styles.contentSection}>
-                <h2 style={styles.sectionTitle}>Experience</h2>
-                {experiences.map((exp, index) => (
-                  <div key={index} style={styles.experienceCard}>
-                    <div style={styles.experienceHeader}>
-                      <h3 style={styles.jobTitle}>{exp?.title || ""}</h3>
-                      <span style={styles.jobDuration}>
-                        {exp?.startDate || ""} –{" "}
-                        {exp?.current ? "Present" : exp?.endDate || ""}
-                      </span>
+              {/* Work Experience */}
+              {renderSection(experiences, () => (
+                <div style={styles.contentSection}>
+                  <h2 style={styles.sectionTitle}>Experience</h2>
+                  {experiences.map((exp, index) => (
+                    <div key={index} style={styles.experienceCard}>
+                      <div style={styles.experienceHeader}>
+                        <h3 style={styles.jobTitle}>{exp?.title || ""}</h3>
+                        <span style={styles.jobDuration}>
+                          {exp?.startDate || ""} –{" "}
+                          {exp?.current ? "Present" : exp?.endDate || ""}
+                        </span>
+                      </div>
+                      <p style={styles.companyName}>
+                        <span style={styles.companyIcon}>🏢</span>
+                        {exp?.organization || ""}
+                      </p>
+                      <ul style={styles.jobDescription}>
+                        {renderDescriptionItems(exp?.description)}
+                      </ul>
                     </div>
-                    <p style={styles.companyName}>
-                      <span style={styles.companyIcon}>🏢</span>
-                      {exp?.organization || ""}
-                    </p>
-                    <ul style={styles.jobDescription}>
-                      {renderDescriptionItems(exp?.description)}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            ))}
-
-            {/* Education */}
-            {renderSection(education, () => (
-              <div style={styles.contentSection}>
-                <h2 style={styles.sectionTitle}>Education</h2>
-                {education.map((edu, index) => (
-                  <div key={index} style={styles.experienceCard}>
-                    <div style={styles.experienceHeader}>
-                      <h3 style={styles.jobTitle}>{edu?.degree || ""}</h3>
-                      <span style={styles.jobDuration}>
-                        {edu?.startDate || ""} – {edu?.endDate || ""}
-                      </span>
-                    </div>
-                    <p style={styles.companyName}>
-                      <span style={styles.companyIcon}>🎓</span>
-                      {edu?.school || ""}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          {/* Right Column */}
-          <div>
-            {/* Skills */}
-            {renderSection(skills, () => (
-              <div style={styles.contentSection}>
-                <h2 style={styles.sectionTitle}>Skills</h2>
-                <div style={styles.skillsContainer}>
-                  {skills.map((skill, index) => (
-                    <span key={index} style={styles.skillTag}>
-                      {skill?.name || skill || ""}
-                    </span>
                   ))}
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {/* Languages */}
-            {renderSection(languages, () => (
-              <div style={styles.contentSection}>
-                <h2 style={styles.sectionTitle}>Languages</h2>
-                {languages.map((lang, index) => (
-                  <div key={index} style={styles.languageItem}>
-                    <div style={styles.languageInfo}>
-                      <span style={styles.languageName}>
-                        {lang?.name || ""}
-                      </span>
-                      <span style={styles.languageLevel}>
-                        {lang?.proficiency || ""}
-                      </span>
-                    </div>
-                    {/* <div style={styles.languageBar}>
-                      <div
-                        style={{
-                          ...styles.languageProgress,
-                          width: `${lang?.level || 0}%`,
-                        }}
-                      ></div>
-                    </div> */}
-                  </div>
-                ))}
-              </div>
-            ))}
-
-            {/* Certifications */}
-            {renderSection(certifications, () => (
-              <div style={styles.contentSection}>
-                <h2 style={styles.sectionTitle}>Certifications</h2>
-                {certifications.map((cert, index) => (
-                  <div key={index} style={styles.experienceCard}>
-                    <h3 style={styles.jobTitle}>{cert?.name || ""}</h3>
-                    <p style={styles.companyName}>
-                      <span style={styles.companyIcon}>🏆</span>
-                      {cert?.organization || ""}{" "}
-                      {cert?.date && `(${cert.date})`}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ))}
-
-            {/* Hobbies */}
-            {renderSection(hobbies, () => (
-              <div style={styles.contentSection}>
-                <h2 style={styles.sectionTitle}>Hobbies</h2>
-                <div style={styles.hobbiesContainer}>
-                  {hobbies.map((hobby, index) => {
-                    let hobbyIcon = "✨";
-                    const hobbyName = typeof hobby === "string" ? hobby : "";
-
-                    if (hobbyName === "Running") hobbyIcon = "🏃";
-                    else if (hobbyName === "Reading") hobbyIcon = "📚";
-                    else if (hobbyName === "Guitar") hobbyIcon = "🎸";
-                    else if (hobbyName === "Travel") hobbyIcon = "✈️";
-
-                    return (
-                      <div key={index} style={styles.hobbyItem}>
-                        <span style={styles.hobbyIcon}>{hobbyIcon}</span>
-                        <span>{hobbyName}</span>
+              {/* Education */}
+              {renderSection(education, () => (
+                <div style={styles.contentSection}>
+                  <h2 style={styles.sectionTitle}>Education</h2>
+                  {education.map((edu, index) => (
+                    <div key={index} style={styles.experienceCard}>
+                      <div style={styles.experienceHeader}>
+                        <h3 style={styles.jobTitle}>{edu?.degree || ""}</h3>
+                        <span style={styles.jobDuration}>
+                          {edu?.startDate || ""} – {edu?.endDate || ""}
+                        </span>
                       </div>
-                    );
-                  })}
+                      <p style={styles.companyName}>
+                        <span style={styles.companyIcon}>🎓</span>
+                        {edu?.school || ""}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Right Column */}
+            <div>
+              {/* Skills */}
+              {renderSection(skills, () => (
+                <div style={styles.contentSection}>
+                  <h2 style={styles.sectionTitle}>Skills</h2>
+                  <div style={styles.skillsContainer}>
+                    {skills.map((skill, index) => (
+                      <span key={index} style={styles.skillTag}>
+                        {skill?.name || skill || ""}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+
+              {/* Languages */}
+              {renderSection(languages, () => (
+                <div style={styles.contentSection}>
+                  <h2 style={styles.sectionTitle}>Languages</h2>
+                  {languages.map((lang, index) => (
+                    <div key={index} style={styles.languageItem}>
+                      <div style={styles.languageInfo}>
+                        <span style={styles.languageName}>
+                          {lang?.name || ""}
+                        </span>
+                        <span style={styles.languageLevel}>
+                          {lang?.proficiency || ""}
+                        </span>
+                      </div>
+                      {/* <div style={styles.languageBar}>
+                        <div
+                          style={{
+                            ...styles.languageProgress,
+                            width: `${lang?.level || 0}%`,
+                          }}
+                        ></div>
+                      </div> */}
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+              {/* Certifications */}
+              {renderSection(certifications, () => (
+                <div style={styles.contentSection}>
+                  <h2 style={styles.sectionTitle}>Certifications</h2>
+                  {certifications.map((cert, index) => (
+                    <div key={index} style={styles.experienceCard}>
+                      <h3 style={styles.jobTitle}>{cert?.name || ""}</h3>
+                      <p style={styles.companyName}>
+                        <span style={styles.companyIcon}>🏆</span>
+                        {cert?.organization || ""}{" "}
+                        {cert?.date && `(${cert.date})`}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ))}
+
+              {/* Hobbies */}
+              {renderSection(hobbies, () => (
+                <div style={styles.contentSection}>
+                  <h2 style={styles.sectionTitle}>Hobbies</h2>
+                  <div style={styles.hobbiesContainer}>
+                    {hobbies.map((hobby, index) => {
+                      let hobbyIcon = "✨";
+                      const hobbyName = typeof hobby === "string" ? hobby : "";
+
+                      if (hobbyName === "Running") hobbyIcon = "🏃";
+                      else if (hobbyName === "Reading") hobbyIcon = "📚";
+                      else if (hobbyName === "Guitar") hobbyIcon = "🎸";
+                      else if (hobbyName === "Travel") hobbyIcon = "✈️";
+
+                      return (
+                        <div key={index} style={styles.hobbyItem}>
+                          <span style={styles.hobbyIcon}>{hobbyIcon}</span>
+                          <span>{hobbyName}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+// Extending the styles object with new button styles
+// const buttonStyles = {
+
+// };
+
+// // Merge the new button styles with the existing styles
+// const mergedStyles = { ...styles, ...buttonStyles };
 
 export default Resume2;

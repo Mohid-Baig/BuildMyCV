@@ -35,52 +35,60 @@ const Resume4 = () => {
       imagePreview: "/api/placeholder/180/180",
     },
     skills: [
-      { name: "Angular", percentage: 90 },
-      { name: "JavaScript", percentage: 85 },
-      { name: "HTML", percentage: 95 },
-      { name: "CSS", percentage: 80 },
-      { name: "React", percentage: 65 },
+      { name: "Angular", proficiency: 90 }, // Changed percentage to proficiency to match component
+      { name: "JavaScript", proficiency: 85 },
+      { name: "HTML", proficiency: 95 },
+      { name: "CSS", proficiency: 80 },
+      { name: "React", proficiency: 65 },
     ],
     languages: [
-      { name: "Urdu", level: 5 },
-      { name: "English", level: 4 },
+      { name: "Urdu", proficiency: 5 }, // Changed level to proficiency
+      { name: "English", proficiency: 4 },
     ],
     education: [
       {
-        date: "2020 - 2024",
+        startDate: "2020-01-01",
+        graduationDate: "2024-01-01",
         degree: "BS in Computer Science",
-        institution: "NCBA&E",
+        school: "NCBA&E", // Changed institution to school to match component
       },
       {
-        date: "2018 - 2020",
+        startDate: "2018-01-01",
+        graduationDate: "2020-01-01",
         degree: "Intermediate",
-        institution: "Superior College",
+        school: "Superior College",
       },
       {
-        date: "2016 - 2018",
+        startDate: "2016-01-01",
+        graduationDate: "2018-01-01",
         degree: "Matric",
-        institution: "Pakistan Grammar School",
+        school: "Pakistan Grammar School",
       },
     ],
     experiences: [
       {
-        position: "Senior Software Developer",
-        company: "ABC Tech",
-        date: "2020 - Present",
+        title: "Senior Software Developer", // Changed position to title
+        organization: "ABC Tech", // Changed company to organization
+        startDate: "2020-01-01",
+        current: true,
         description:
           "Worked on enterprise-level web applications, leading a team of developers and coordinating with stakeholders. Implemented new features, optimized performance, and mentored junior developers. Established coding standards and best practices for the front-end development team.",
       },
       {
-        position: "Software Developer",
-        company: "XYZ Solutions",
-        date: "2018 - 2020",
+        title: "Software Developer",
+        organization: "XYZ Solutions",
+        startDate: "2018-01-01",
+        endDate: "2020-01-01",
+        current: false,
         description:
           "Contributed to various front-end projects using Angular and JavaScript, optimized performance and improved UI/UX. Collaborated with the design team to implement responsive interfaces and ensure consistent user experience across different devices.",
       },
       {
-        position: "Junior Developer",
-        company: "StartUp Hub",
-        date: "2016 - 2018",
+        title: "Junior Developer",
+        organization: "StartUp Hub",
+        startDate: "2016-01-01",
+        endDate: "2018-01-01",
+        current: false,
         description:
           "Built small-scale websites and internal tools under mentorship. Learned Agile development practices and gained valuable experience in full-stack development environments. Participated in code reviews and daily stand-up meetings.",
       },
@@ -113,28 +121,28 @@ const Resume4 = () => {
     ],
     certifications: [
       {
-        icon: "fa-certificate",
-        title: "Angular Certified Developer",
+        icon: "fa-certificate", // This is correct
+        name: "Angular Certified Developer", // Changed title to name to match component
         organization: "Google • 2023",
       },
       {
         icon: "fa-award",
-        title: "JavaScript Advanced Programming",
+        name: "JavaScript Advanced Programming",
         organization: "Udemy • 2022",
       },
       {
         icon: "fa-medal",
-        title: "Responsive Web Design",
+        name: "Responsive Web Design",
         organization: "freeCodeCamp • 2021",
       },
       {
         icon: "fa-trophy",
-        title: "Agile Project Management",
+        name: "Agile Project Management",
         organization: "Coursera • 2020",
       },
     ],
     interests: [
-      { icon: "fa-code", name: "Coding" },
+      { icon: "fa-code", name: "Coding" }, // This is correct
       { icon: "fa-book", name: "Reading" },
       { icon: "fa-mountain", name: "Hiking" },
       { icon: "fa-chess", name: "Chess" },
@@ -394,7 +402,7 @@ const Resume4 = () => {
   );
 };
 
-// Rest of the component definitions remain the same...
+// Skill Component
 const Skill = ({ name, percentage, styles }) => {
   const fillStyle = {
     height: "100%",
@@ -415,6 +423,7 @@ const Skill = ({ name, percentage, styles }) => {
   );
 };
 
+// Education Component
 const Education = ({ date, degree, institution, styles }) => {
   const educationBefore = {
     content: '""',
@@ -448,6 +457,7 @@ const Education = ({ date, degree, institution, styles }) => {
   );
 };
 
+// Language Component
 const Language = ({ name, level, styles }) => {
   return (
     <li style={styles.languageItem}>
@@ -457,6 +467,7 @@ const Language = ({ name, level, styles }) => {
   );
 };
 
+// Experience Component
 const Experience = ({ position, company, date, description, styles }) => {
   const experienceBefore = {
     content: '""',
@@ -485,6 +496,7 @@ const Experience = ({ position, company, date, description, styles }) => {
   );
 };
 
+// Project Component
 const Project = ({ title, subtitle, description, styles }) => {
   return (
     <div style={styles.projectCard}>
@@ -499,11 +511,12 @@ const Project = ({ title, subtitle, description, styles }) => {
   );
 };
 
+// Certification Component
 const Certification = ({ icon, title, organization, styles }) => {
   return (
     <div style={styles.certificationCard}>
       <div style={styles.certificationIcon}>
-        <i className={`fa-solid ${icon}`}></i>
+        <i className={`fas ${icon}`}></i>
       </div>
       <div>
         <h4 style={styles.certificationInfoH4}>{title}</h4>
@@ -513,10 +526,11 @@ const Certification = ({ icon, title, organization, styles }) => {
   );
 };
 
+// Interest Component
 const Interest = ({ icon, name, styles }) => {
   return (
     <div style={styles.interestBadge}>
-      <i className={`fa-solid ${icon}`} style={styles.interestBadgeI}></i>
+      <i className={`fas ${icon}`} style={styles.interestBadgeI}></i>
       <span>{name}</span>
     </div>
   );
