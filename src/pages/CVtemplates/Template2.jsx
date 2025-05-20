@@ -9,7 +9,6 @@ const Resume2 = () => {
   const resumeRef = useRef(null);
   const navigate = useNavigate();
 
-  // Check for saved data in localStorage
   useEffect(() => {
     try {
       const savedData = localStorage.getItem("resumeData");
@@ -24,7 +23,6 @@ const Resume2 = () => {
     }
   }, []);
 
-  // Download PDF function
   const downloadPDF = async () => {
     try {
       setIsDownloading(true);
@@ -72,12 +70,10 @@ const Resume2 = () => {
     }
   };
 
-  // Handle Edit button click
   const handleEdit = () => {
     navigate("/form");
   };
 
-  // Static fallback data
   const staticData = {
     personalInfo: {
       firstName: "Your",
