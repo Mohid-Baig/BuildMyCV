@@ -13,7 +13,6 @@ const SignUp = () => {
     e.preventDefault();
     setError("");
 
-    // Validate password
     if (password.length < 8 || !/\d/.test(password)) {
       setError(
         "Password must be at least 8 characters with at least one number"
@@ -21,7 +20,6 @@ const SignUp = () => {
       return;
     }
 
-    // Check if user already exists
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const userExists = users.some((user) => user.email === email);
 
@@ -30,18 +28,15 @@ const SignUp = () => {
       return;
     }
 
-    // Create new user
     const newUser = {
       name,
       email,
       password, // Note: In a real app, you should NEVER store plain text passwords
     };
 
-    // Save to local storage
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
 
-    // Redirect to login
     navigate("/login", { state: { registrationSuccess: true } });
   };
 
