@@ -102,7 +102,7 @@ const Resume2 = () => {
     ],
     languages: [
       { name: "English", proficiency: "Native", level: 100 },
-      { name: "Spanish", proficiency: "Advanced", level: 80 },
+      { name: "Urdu", proficiency: "Advanced", level: 80 },
       { name: "French", proficiency: "Intermediate", level: 60 },
     ],
     experiences: [
