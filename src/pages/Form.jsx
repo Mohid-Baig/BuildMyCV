@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../Components/ResumeForm.css";
 
 const ResumeForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     personalInfo: {
       firstName: "",
